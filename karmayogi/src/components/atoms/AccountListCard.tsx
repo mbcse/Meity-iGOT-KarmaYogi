@@ -34,7 +34,7 @@ export default function AccountListCard({ acc }: { acc: iAccountSelection }) {
   return (
     <>
       <div
-        className={`flex items-center justify-between gap-3 p-3 ${isOpen ? "rounded-t-lg" : "rounded-lg"} bg-slate-300 w-[300px] cursor-pointer shadow-md transition-all duration-300`}
+        className={`flex items-center justify-between gap-3 p-3 ${isOpen ? "rounded-tl-lg" : "rounded-tl-lg"} bg-slate-300 w-[300px] cursor-pointer shadow-md transition-all duration-300`}
         onClick={() => {
           setIsOpen(!isOpen);
         }}

@@ -22,7 +22,7 @@ interface AccountSelectorProps {
 export default function AccountSelector({ pfplink, accountInfo, onSelect }: AccountSelectorProps) {
     return (
         <div
-            className="flex items-center justify-between gap-3 p-3 bg-slate-300 w-[300px] cursor-pointer hover:bg-slate-400 shadow-md transition-all duration-300"
+            className="flex items-center  gap-8 p-3 bg-slate-300 w-[300px] cursor-pointer hover:bg-slate-400 shadow-md transition-all duration-300"
             onClick={onSelect}
         >
             <div className='my-2 w-[60px] h-[60px]'>

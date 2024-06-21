@@ -6,7 +6,9 @@ export default function layout({children}:{
   return (
     <>
         <Navbar />
+        <section className='h-screen px-2'>
         {children}
+        </section>
     </>
   )
 }

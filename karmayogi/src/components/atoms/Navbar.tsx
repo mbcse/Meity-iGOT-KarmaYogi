@@ -26,7 +26,7 @@ const navbarArr:navbarItem[] = [
 
 export default function Navbar() {
   return (
-    <nav className='flex py-4 px-6 items-center justify-between'>
+    <nav className='flex py-2 px-6 items-center justify-between'>
         <div className='text-2xl'>
             Karmayogi
         </div>
