@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client/extension";
 import { NextRequest, NextResponse } from "next/server";
-import {verify} from '@node-rs/argon2'
 import jwt from 'jsonwebtoken'
+import { compare } from "bcryptjs";
 export async function POST(req:NextRequest,res:NextResponse){
     try {
         const prisma = new PrismaClient();
@@ -21,12 +21,7 @@ export async function POST(req:NextRequest,res:NextResponse){
         }
 
 
-        const isPassValid = await verify(user.password,password,{
-            memoryCost: 19456,
-		timeCost: 2,
-		outputLen: 32,
-		parallelism: 1
-        });
+        const isPassValid = await compare(user.password,password);
 
         if(!isPassValid){
             return NextResponse.json({
