@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: karmayogi-dev-db
+    environment:
+      POSTGRES_DB: karmayogi-dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "3010:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
