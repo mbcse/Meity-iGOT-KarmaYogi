@@ -17,14 +17,26 @@ export default function Page() {
             Login
           </Button>
           
-          <div className='py-4 italic'>
-            Have an account already? 
-            <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
-              <Link href={'/login'}>
-                Sign In now
-              </Link>
-            </Button>
-          </div>
+          <div>
+
+<div className=' italic'>
+  Forgot your password? 
+  <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
+    Forgot my password
+  </Button>
+</div>
+
+<div className=' italic'>
+  Don't have an account? 
+  <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
+    <Link href={'/signup'}>
+        Create an account
+    </Link>
+  </Button>
+</div>
+</div>
+
+
         </form>
       </div>
     </div>
