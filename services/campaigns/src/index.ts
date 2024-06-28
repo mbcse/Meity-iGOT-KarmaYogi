@@ -5,8 +5,10 @@ const app = express();
 const port = 3001;
 
 import pixelRouter from './router/pixelRouter'
+import statsRouter from './router/statsRouter';
 
 app.use('/pixel',pixelRouter)
+app.use('/stats',statsRouter)
 
 app.get('/', (req: Request, res: Response) => {
   // console.log(req)
