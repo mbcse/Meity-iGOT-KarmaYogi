@@ -4,9 +4,10 @@ import express, { Request, Response } from 'express';
 const prisma = new PrismaClient();
 const pixelRouter = express.Router();
 
-pixelRouter.get("/", async (req: Request, res: Response) => {
+pixelRouter.get("/email/:id", async (req: Request, res: Response) => {
   try {
     // Set response headers for a transparent 1x1 pixel
+    const {id} = req.params;
     res.set({
       'Content-Type': 'image/gif',
       'Cache-Control': 'no-store, no-cache, must-revalidate, private',
@@ -14,6 +15,7 @@ pixelRouter.get("/", async (req: Request, res: Response) => {
       'Expires': '0'
     });
 
+    
     // Extract device type from request query or headers
     const deviceType = req.query.deviceType?.toString() || 'desktop'; // Ensure deviceType is a string
 
@@ -45,7 +47,7 @@ pixelRouter.get("/", async (req: Request, res: Response) => {
     // Fetch the current regionsClicks value
     const emailCampaign = await prisma.emailCampaign.findUnique({
       where: {
-        id: "clxxjiz7g0001am13k30cawae" // Replace with your actual campaign ID
+        id: id // Replace with your actual campaign ID
       },
       select: {
         regionsClicks: true
@@ -65,7 +67,7 @@ pixelRouter.get("/", async (req: Request, res: Response) => {
       // Update email campaign statistics using Prisma
       await prisma.emailCampaign.update({
         where: {
-          id: "clxxjiz7g0001am13k30cawae" // Replace with your actual campaign ID
+          id: id // Replace with your actual campaign ID
         },
         data: {
           ...updateData,
@@ -84,5 +86,6 @@ pixelRouter.get("/", async (req: Request, res: Response) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 export default pixelRouter;
