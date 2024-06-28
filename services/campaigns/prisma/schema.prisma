@@ -27,15 +27,15 @@ model WhatsAppCampaign {
   campaignID      String
   title           String
   mailbody        String   // URL to file
-  targeted        Int
-  bounced         Int
-  opened          Int
-  mobile          Int
-  desktop         Int
+  targeted        Int @default(0)
+  bounced         Int @default(0)
+  opened          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
   sentAt          DateTime // When the email was sent
   status          String   // Campaign status (e.g., "scheduled", "sent", "completed")
-  unsubscribed    Int
-  spamReports     Int
+  unsubscribed    Int @default(0)
+  spamReports     Int @default(0)
   ctalinks        CTALink[]
   regionsClicks   Json
   campaign        Campaign @relation(fields: [campaignID], references: [id])
@@ -46,15 +46,15 @@ model SMSCampaign {
   campaignID      String
   title           String
   mailbody        String   // URL to file
-  targeted        Int
-  bounced         Int
-  opened          Int
-  mobile          Int
-  desktop         Int
+  targeted        Int @default(0)
+  bounced         Int @default(0)
+  opened          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
   sentAt          DateTime // When the email was sent
   status          String   // Campaign status (e.g., "scheduled", "sent", "completed")
-  unsubscribed    Int
-  spamReports     Int
+  unsubscribed    Int @default(0)
+  spamReports     Int @default(0)
   ctalinks        CTALink[]
   regionsClicks   Json
   campaign        Campaign @relation(fields: [campaignID], references: [id])
@@ -65,15 +65,15 @@ model EmailCampaign {
   campaignID      String
   title           String
   mailbody        String   // URL to file
-  targeted        Int
-  bounced         Int
-  opened          Int
-  mobile          Int
-  desktop         Int
+  targeted        Int @default(0)
+  bounced         Int @default(0)
+  opened          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
   sentAt          DateTime // When the email was sent
   status          String   // Campaign status (e.g., "scheduled", "sent", "completed")
-  unsubscribed    Int
-  spamReports     Int
+  unsubscribed    Int @default(0)
+  spamReports     Int @default(0)
   ctalinks        CTALink[]
   regionsClicks   Json
   campaign        Campaign @relation(fields: [campaignID], references: [id])
@@ -82,10 +82,10 @@ model EmailCampaign {
 model CTALink {
   id              String   @id @default(cuid())
   url             String
-  clicks          Int
-  mobile          Int
-  desktop         Int
-  regionsClicks   Json
+  clicks          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
+  regionsClicks   Json 
   emailCampaignID String?
   smsCampaignID   String?
   whatsappCampaignID String?
