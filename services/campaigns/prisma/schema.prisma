@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  campaignName String
+  campaignType CampaignType[]
+  whatsappCampaign WhatsAppCampaign[]
+  smsCampaign    SMSCampaign[]
+  emailCampaign  EmailCampaign[]
+}
+
+model WhatsAppCampaign {
+  id              String   @id @default(cuid())
+  campaignID      String
+  title           String
+  mailbody        String   // URL to file
+  targeted        Int @default(0)
+  bounced         Int @default(0)
+  opened          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
+  sentAt          DateTime // When the email was sent
+  status          String   // Campaign status (e.g., "scheduled", "sent", "completed")
+  unsubscribed    Int @default(0)
+  spamReports     Int @default(0)
+  ctalinks        CTALink[]
+  regionsClicks   Json
+  campaign        Campaign @relation(fields: [campaignID], references: [id])
+}
+
+model SMSCampaign {
+  id              String   @id @default(cuid())
+  campaignID      String
+  title           String
+  mailbody        String   // URL to file
+  targeted        Int @default(0)
+  bounced         Int @default(0)
+  opened          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
+  sentAt          DateTime // When the email was sent
+  status          String   // Campaign status (e.g., "scheduled", "sent", "completed")
+  unsubscribed    Int @default(0)
+  spamReports     Int @default(0)
+  ctalinks        CTALink[]
+  regionsClicks   Json
+  campaign        Campaign @relation(fields: [campaignID], references: [id])
+}
+
+model EmailCampaign {
+  id              String   @id @default(cuid())
+  campaignID      String
+  title           String
+  mailbody        String   // URL to file
+  targeted        Int @default(0)
+  bounced         Int @default(0)
+  opened          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
+  sentAt          DateTime // When the email was sent
+  status          String   // Campaign status (e.g., "scheduled", "sent", "completed")
+  unsubscribed    Int @default(0)
+  spamReports     Int @default(0)
+  ctalinks        CTALink[]
+  regionsClicks   Json
+  campaign        Campaign @relation(fields: [campaignID], references: [id])
+}
+
+model CTALink {
+  id              String   @id @default(cuid())
+  url             String
+  clicks          Int @default(0)
+  mobile          Int @default(0)
+  desktop         Int @default(0)
+  regionsClicks   Json 
+  emailCampaignID String?
+  smsCampaignID   String?
+  whatsappCampaignID String?
+  emailCampaign   EmailCampaign? @relation(fields: [emailCampaignID], references: [id])
+  smsCampaign     SMSCampaign? @relation(fields: [smsCampaignID], references: [id])
+  whatsappCampaign WhatsAppCampaign? @relation(fields: [whatsappCampaignID], references: [id])
+}
+
+enum CampaignType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
