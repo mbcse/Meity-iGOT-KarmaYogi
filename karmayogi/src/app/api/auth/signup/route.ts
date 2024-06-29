@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client/extension";
+import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import {hash} from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -6,14 +6,13 @@ import jwt from 'jsonwebtoken'
 export async function POST(req:NextRequest,res:NextResponse){
     try {
         const prisma = new PrismaClient();
-        const {email,password,name} = await req.json();
-
+        const {email,password} = await req.json();
+        console.log(email,password)
         const passwordHash = await hash(password,10);
 
-        const user = prisma.user.create({
+        const user = await prisma.user.create({
             data:{
                 email:email,
-                name : name,
                 password:passwordHash
             }
         })
@@ -35,7 +34,6 @@ export async function POST(req:NextRequest,res:NextResponse){
 
         return NextResponse.json({
             type:"success",
-            message : token
         });
         
     } catch (error) {
