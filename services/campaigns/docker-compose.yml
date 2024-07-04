@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: campaigns-db
+    environment:
+      POSTGRES_DB: campaigns
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "3011:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
