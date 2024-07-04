@@ -9,6 +9,26 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "3010:5432"
+      - "4001:5432"
     volumes:
       - ./db_data:/var/lib/postgresql/data
+  
+  user_db:
+    image: postgres:latest
+    container_name: user-dev-db
+    environment:
+      POSTGRES_DB: user-dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "4002:5432"
+    volumes:
+      - ./user_db:/var/lib/postgresql/data
+
+  
+  message-queue:
+    image: redis:latest
+    container_name: gatesend-queue
+    ports:
+      - "4003:6379"
+    
