@@ -1,0 +1,87 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog],
+and this project adheres to [Semantic Versioning].
+
+## [pre-dev-0.0.1] - 2024-07-06
+
+### Added
+
+- Create Changelog.md and Documentation.md
+- Init /karmyogi (nextJS app) 
+- Added ShadCN to /karmayogi
+- Initialized prisma in /karmayogi
+- Added Button from shadcn ui
+- Added Storybook to /karmayogi
+- Configured storybook for dark theme 
+- Added next-themes for /karmayogi
+- Init /services (Microservices folder)
+- /services
+    /caches
+    /producers
+    /utils
+    /workers
+    ...(rest of files)
+- /services : uses ts-node-dev
+  
+## [pre-dev-0.0.2] - 2024-07-06
+
+### Added
+
+- Added test cases for /services
+- Added infra for temp docker based auxillary services for testing . It will spin up container , perform tests , and take containers down after it .
+- the above thing is done with newly added compose.yaml and compose.test.sh
+- Added e2e testing for NextJS /karmayogi with help of custom docker image to support any type of OS
+- Added Prisma in services
+- Added the following test cases for /services
+
+    ```
+    /services 
+        /tests
+            | auth.test.js
+            | health.test.js
+            | producer.test.js
+    ```
+
+- Added concurrently for executing /services script
+- Added xdescribe to TODO folder for tests .
+
+
+## [pre-dev-0.0.3] - 2024-07-14
+
+BRANCH : feature/004/redis-setup
+
+### Added
+
+- Added router for producer 
+- Added utils for producers 
+- Made postman collections for testing producers
+- Redis queues works well with producers  
+
+
+## [pre-dev-0.0.4] - 2024-07-15
+
+BRANCH : feature/005/llmsql
+
+### Added
+
+- Added prisma to karmayogi
+- Added @langchain packages
+- Added ChatBot API to karmayogi (/buckets)
+- Made sure that user query and outputted sql queries are logged for creating a strong dataset
+- Table component created 
+- DB seeding script written with @fakerjs with en_IN localisation
+- Chatbot have programmatic blockers to prevent execution of commands such as UPDATE,DELETE,DROP
+
+
+## [pre-dev-0.0.5] - 2024-07-16
+
+### Added
+
+- Added api for creating and showing view in /karmayogi nextjs app
+- Added saving bucket api in /services
+- Prisma schema in /Services , added bucket model
+
+
