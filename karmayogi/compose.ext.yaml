@@ -1,0 +1,15 @@
+services:
+  external-db:
+    image: postgres:latest
+    container_name: ext-db
+    environment:
+      POSTGRES_DB: ext-services
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "6001:5432"
+    volumes:
+      - ext-db-data:/var/lib/postgresql/data
+
+volumes:
+  ext-db-data:
