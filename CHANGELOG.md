@@ -47,3 +47,28 @@ and this project adheres to [Semantic Versioning].
 
 - Added concurrently for executing /services script
 - Added xdescribe to TODO folder for tests .
+
+
+## [pre-dev-0.0.3] - 2024-07-14
+
+BRANCH : feature/004/redis-setup
+
+### Added
+
+- Added router for producer 
+- Added utils for producers 
+- Made postman collections for testing producers
+- Redis queues works well with producers  
+
+
+## [pre-dev-0.0.4] - 2024-07-15
+
+### Added
+
+- Added prisma to karmayogi
+- Added @langchain packages
+- Added ChatBot API to karmayogi (/buckets)
+- Made sure that user query and outputted sql queries are logged for creating a strong dataset
+- Table component created 
+- DB seeding script written with @fakerjs with en_IN localisation
+- Chatbot have programmatic blockers to prevent execution of commands such as UPDATE,DELETE,DROP
