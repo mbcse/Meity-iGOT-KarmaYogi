@@ -4,15 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run":"ts-node-dev --respawn --transpile-only ./src/server.ts"
+    "server": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "test": "concurrently \"pnpm run server\" \"docker compose up -d && ./compose.test.sh\""
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "./tests/TODO"
+    ]
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.2",
+    "bullmq": "^5.8.4",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2"
   },
   "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/express": "^4.17.21",
+    "concurrently": "^8.2.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.3"
   }
