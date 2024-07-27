@@ -47,3 +47,15 @@ and this project adheres to [Semantic Versioning].
 
 - Added concurrently for executing /services script
 - Added xdescribe to TODO folder for tests .
+
+
+## [pre-dev-0.0.3] - 2024-07-14
+
+BRANCH : feature/004/redis-setup
+
+### Added
+
+- Added router for producer 
+- Added utils for producers 
+- Made postman collections for testing producers
+- Redis queues works well with producers  
