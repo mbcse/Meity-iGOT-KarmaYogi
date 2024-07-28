@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+}
+
+model Buckets {
+  id            String      @id @default(cuid())
+  name          String    
+  changedName   String    @unique
+  query         String
+  createdAt     DateTime
+  updatedAt     DateTime
+  whatsappCampaigns WhatsAppCampaign[]
+  smsCampaigns      SMSCampaign[]
+  emailCampaigns    EmailCampaign[]
+}
+
+model Campaign {
+  id               String             @id @default(cuid())
+  campaignName     String
+  timeCreate       DateTime           @default(now())
+  noOfEmails       Int                @default(0)
+  noOfSMS          Int                @default(0)
+  noOfWhatsApp     Int                @default(0)
+  noOfUsers        Int                @default(0)
+  bgImgUrl        String  @default("https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg")
+  campaignType     CampaignType[]
+  whatsappCampaign WhatsAppCampaign[]
+  smsCampaign      SMSCampaign[]
+  emailCampaign    EmailCampaign[]
+}
+
+model WhatsAppCampaign {
+  id            String         @id @default(cuid())
+  campaignID    String
+  campaignTitle       String @default("")
+  Number    String
+  bucket    Buckets  @relation(fields: [bucketID], references: [id])
+  bucketID  String
+  textbody      String // URL to file
+  targeted      Int            @default(0)
+  bounced       Int            @default(0)
+  scheduled     DateTime
+  status        CampaignStatus
+  unsubscribed  Int            @default(0)
+  regionsClicks String[]
+  ctalinks      CTALink[]      @relation("WhatsAppCampaignCTALinks")
+  campaign      Campaign       @relation(fields: [campaignID], references: [id])
+
+  @@index([campaignID])
+}
+
+model SMSCampaign {
+  id            String         @id @default(cuid())
+  campaignID    String
+  campaignTitle       String @default("")
+  Number    String
+  bucket    Buckets  @relation(fields: [bucketID], references: [id])
+  bucketID  String 
+  SMSBody       String // URL to file
+  targeted      Int            @default(0)
+  bounced       Int            @default(0)
+  scheduled     DateTime
+  status        CampaignStatus
+  unsubscribed  Int            @default(0)
+  regionsClicks String[]
+  ctalinks      CTALink[]      @relation("SMSCampaignCTALinks")
+  campaign      Campaign       @relation(fields: [campaignID], references: [id])
+
+  @@index([campaignID])
+}
+
+model EmailCampaign {
+  id            String         @id @default(cuid())
+  campaignID    String
+  campaignTitle       String @default("")
+  fromMail      String
+  mailbody      String // URL to file
+  bucket    Buckets  @relation(fields: [bucketID], references: [id]) 
+  bucketID  String 
+  targeted      Int            @default(0)
+  bounced       Int            @default(0)
+  opened        Int            @default(0)
+  mobile        Int            @default(0)
+  desktop       Int            @default(0)
+  scheduled     DateTime
+  status        CampaignStatus
+  unsubscribed  Int            @default(0)
+  spamReports   Int            @default(0)
+  ctalinks      CTALink[]      @relation("EmailCampaignCTALinks")
+  regionsClicks String[]
+  campaign      Campaign       @relation(fields: [campaignID], references: [id])
+
+  @@index([campaignID])
+}
+
+model CTALink {
+  id                 String              @id @default(cuid())
+  url                String
+  clicks             Int                 @default(0)
+  mobile             Int                 @default(0)
+  desktop            Int                 @default(0)
+  regionsClicks      String[]
+  whatsappCampaigns  WhatsAppCampaign[]  @relation("WhatsAppCampaignCTALinks")
+  smsCampaigns       SMSCampaign[]       @relation("SMSCampaignCTALinks")
+  emailCampaigns     EmailCampaign[]     @relation("EmailCampaignCTALinks")
+}
+
+enum CampaignType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum CampaignStatus {
+  PENDING
+  SENT
+  FAILED
+  DRAFT
+}
+
+model Template {
+  id            String         @id @default(cuid())
+  name          String
+  type          CampaignType[]
+  body          String // URL to file
+  createdAt     DateTime
+  updatedAt     DateTime
+  noCode        Boolean @default(false)
+}
