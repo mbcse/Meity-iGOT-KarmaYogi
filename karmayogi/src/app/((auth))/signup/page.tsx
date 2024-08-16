@@ -52,7 +52,7 @@ export default function Page() {
   };
 
   return (
-    <div className='p-8 w-full flex items-center justify-center'>
+    <div className='py-8 px-2 bg-[#262626] text-white rounded-r-lg w-full flex items-center justify-center'>
       <div className='flex flex-col gap-3'>
         <h1 className='font-bold text-2xl my-3'>
           Let&apos;s get you started!
@@ -89,7 +89,8 @@ export default function Page() {
             By signing up, you agree to our T&C
           </div>
 
-          <Button type="submit" aria-label="signup button">
+          <Button type="submit" aria-label="signup button" className='bg-[#5456DB]'>
+
             Sign Up
           </Button>
           

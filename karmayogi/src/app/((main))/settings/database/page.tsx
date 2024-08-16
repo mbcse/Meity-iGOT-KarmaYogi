@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import React, { useState, KeyboardEvent, ChangeEvent } from 'react';
-import { DataTable } from "@/app/settings/database/data-table";
+import { DataTable } from "@/app/((main))/settings/database/data-table";
 import { columns } from "./columns";
 // Modal component
 const Modal = ({ tables, onClose }: { tables: any, onClose: () => void }) => {
