@@ -19,6 +19,7 @@
     "@langchain/core": "^0.2.15",
     "@langchain/groq": "^0.0.13",
     "@prisma/client": "5.16.2",
+    "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
