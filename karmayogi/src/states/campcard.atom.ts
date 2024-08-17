@@ -1,17 +1,6 @@
+// atoms.ts
 import { atom } from 'jotai';
+import  {CampCardProps}  from '@/app/((main))/campaigns/page';
 
-export interface CampaignData {
-    id:string;
-  campaignName: string;
-  noOfSMS: number;
-  noOfEmails: number;
-  noOfWhatsApp: number;
-  noOfUsers: number;
-  bgImgUrl: string;
-}
-
-export const campCardAtom = atom<CampaignData[]>([]);
-
-export const campCardChildAtom = atom<null | CampaignData>(
-  null
-);
+export const campaignsAtom = atom<CampCardProps[]>([]);
+export const isCreateModalOpenAtom = atom(false);
