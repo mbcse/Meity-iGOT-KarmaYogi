@@ -18,12 +18,11 @@ export interface CampCardProps {
   };
 
 export default async function Page() {
-  const data = await fetch("http://localhost:3010/campaigns", { cache: "no-store" }).then((res) => res.json())
 
   return (
-    <>
+    <div className="h-full">
     <CampaignsCardPage />    
     <CampaignTablePage />
-    </>
+    </div>
   )
 }
