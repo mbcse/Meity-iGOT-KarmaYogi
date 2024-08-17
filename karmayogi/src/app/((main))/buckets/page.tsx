@@ -1,7 +1,7 @@
 "use client";
 import React, { FormEvent, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronUp, Bookmark, Folder } from 'lucide-react';
+import { ChevronUp, Bookmark, Folder, Plus } from 'lucide-react';
 import SQLTable from '@/components/atoms/table/SQLTable';
 import {
     Dialog,
@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { submitUserInput, saveBucket, showViewBucket, fetchBuckets } from '@/services/bucket/api';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Page() {
     const [inputValue, setInputValue] = useState('');
@@ -109,6 +109,13 @@ export default function Page() {
         }
     };
 
+    const handleNewBucket = () => {
+        setInputValue('');
+        setResponse(null);
+        setQuery('');
+        setCurrentBucket(null);
+    };
+
     return (
         <div className="flex flex-1 h-screen overflow-hidden">
             <aside className="w-64 bg-white border-r p-4 overflow-y-auto">
@@ -134,36 +141,42 @@ export default function Page() {
                     <h1 className="text-2xl font-bold text-gray-800">
                         {currentBucket || 'Untitled'}
                     </h1>
-                    {response && (
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                    <Bookmark className="mr-2 h-4 w-4" />
-                                    Save Bucket
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Save this table</DialogTitle>
-                                    <DialogDescription>
-                                        <Input
-                                            type="text"
-                                            placeholder="Enter your bucket name"
-                                            value={bucketName}
-                                            onChange={(e) => setBucketName(e.target.value)}
-                                            className="mt-2"
-                                        />
-                                        <Button
-                                            className="mt-4 w-full"
-                                            onClick={handleSaveBucket}
-                                        >
-                                            Save
-                                        </Button>
-                                    </DialogDescription>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
-                    )}
+                    <div className="flex items-center gap-4">
+                        <Button variant="outline" size="sm" onClick={handleNewBucket}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            New Bucket
+                        </Button>
+                        {response && (
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                        <Bookmark className="mr-2 h-4 w-4" />
+                                        Save Bucket
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Save this table</DialogTitle>
+                                        <DialogDescription>
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter your bucket name"
+                                                value={bucketName}
+                                                onChange={(e) => setBucketName(e.target.value)}
+                                                className="mt-2"
+                                            />
+                                            <Button
+                                                className="mt-4 w-full"
+                                                onClick={handleSaveBucket}
+                                            >
+                                                Save
+                                            </Button>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+                    </div>
                 </header>
 
                 <>
