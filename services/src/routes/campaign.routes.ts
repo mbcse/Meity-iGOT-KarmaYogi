@@ -29,6 +29,31 @@ campaignRouter.get("/", async (req: Request, res: Response) => {
   }
 });
 
+
+campaignRouter.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const campaign = await prisma.campaign.findUnique({
+      where: { id },
+      include: {
+        whatsappCampaign: true,
+        smsCampaign: true,
+        emailCampaign: true
+      }
+    });
+
+    if (!campaign) {
+      return res.status(404).json({ error: 'Campaign not found' });
+    }
+
+    return res.json(campaign);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the campaign' });
+  }
+});
+
 campaignRouter.get(
   "/subcampaigns/:campaignID",
   async (req: Request, res: Response) => {
@@ -61,6 +86,7 @@ campaignRouter.get(
 );
 
 // Create a new campaign
+// Create a new campaign
 campaignRouter.post("/create", async (req: Request, res: Response) => {
   try {
     const { campaignName } = req.body;
@@ -86,7 +112,7 @@ campaignRouter.post("/create", async (req: Request, res: Response) => {
       },
     });
 
-    return res.json({ event: newCampaign });
+    return res.json(newCampaign); // Return the campaign directly
   } catch (error) {
     console.error(error);
     res
@@ -94,6 +120,7 @@ campaignRouter.post("/create", async (req: Request, res: Response) => {
       .json({ error: "An error occurred while creating the campaign" });
   }
 });
+
 
 // Delete a campaign and associated campaigns
 campaignRouter.delete("/:campaignID", async (req: Request, res: Response) => {
