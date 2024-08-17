@@ -226,11 +226,11 @@ export default function Page() {
                     <Button
                         variant="default"
                         size="icon"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 "
                         type="submit"
                         disabled={isLoading}
                     >
-                        <ChevronUp />
+                        <ChevronUp className='text-[#5456DB]' />
                     </Button>
                 </form>
             </main>
