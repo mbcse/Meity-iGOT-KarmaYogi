@@ -21,6 +21,11 @@ app.use(express.json());
 
 connectDB();
 
+
+app.get("/healthy", (req: Request, res: Response) => {
+  res.json({"status":"Healthy"});
+});
+
 // Error handling
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error(err); // Logs the error using the Winston logger
@@ -28,7 +33,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 7000;
 app.listen(port, () => {
   logger.info(`Server running on port ${port}`);
 });
