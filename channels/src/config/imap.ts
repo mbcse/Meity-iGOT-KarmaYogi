@@ -1,25 +1,37 @@
 import { ImapFlow,MailboxLockObject } from 'imapflow';
-import dotenv from 'dotenv';
+import { IEmailAccount } from '../models/email.models';
 
-dotenv.config();
-
-const imapConfig = {
-    host: process.env.IMAP_HOST || '',
-    port: parseInt(process.env.IMAP_PORT || '993', 10),
-    secure: process.env.IMAP_SECURE === 'true',
+interface ImapConfig {
+    host: string;
+    port: number;
+    secure: boolean;
     auth: {
-        user: process.env.IMAP_USER || '',
-        pass: process.env.IMAP_PASS || ''
-    }
-};
+        user: string;
+        pass: string;
+    };
+}
+
+function convertToImapConfig(emailAccount: IEmailAccount): ImapConfig {
+    return {
+        host: emailAccount.imapURI,
+        port: parseInt(emailAccount.imapPort, 10),
+        secure: true, // Assuming secure connection, modify if needed
+        auth: {
+            user: emailAccount.email,
+            pass: emailAccount.password
+        }
+    };
+}
+
    
-// Function to connect to the IMAP server, lock the INBOX, and return the client and lock instance
-async function connectImap(): Promise<{ imapClient: ImapFlow, lock: MailboxLockObject }> {
+async function connectImap(emailAccount: IEmailAccount): Promise<{ imapClient: ImapFlow, lock: MailboxLockObject }> {
+    const imapConfig = convertToImapConfig(emailAccount);
     const imapClient = new ImapFlow(imapConfig);
     await imapClient.connect();
     const lock = await imapClient.getMailboxLock('INBOX');
     return { imapClient, lock };
 }
+
 async function releaseLockAndLogout(imapClient: ImapFlow, lock: MailboxLockObject): Promise<void> {
     lock.release();
     await imapClient.logout();
