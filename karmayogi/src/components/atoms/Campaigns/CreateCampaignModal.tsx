@@ -46,10 +46,10 @@ export default function CreateCampaignModal() {
     }
 
     const result = await response.json();
-    const newCampaign = result.event;
+    console.log("API Response:", result);
 
-    if (newCampaign && newCampaign.campaignName) {
-      setCampaigns([...campaigns, newCampaign]);
+    if (result && result.campaignName) {
+      setCampaigns([...campaigns, result]);
       setCampaignName('');
       handleClose();
     } else {

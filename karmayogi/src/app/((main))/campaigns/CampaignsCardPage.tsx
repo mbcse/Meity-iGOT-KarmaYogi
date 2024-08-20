@@ -8,23 +8,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function CampaignsCardPage() {
-  const [campaigns, setCampaigns] = useAtom(campaignsAtom);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useAtom(isCreateModalOpenAtom);
-
-const handleCreateClick = () => {
-  setIsCreateModalOpen(true); 
-};
-
-
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      const response = await fetch('http://localhost:3010/campaigns', { cache: 'no-store' });
-      const data = await response.json();
-      setCampaigns(data);
-    };
-
-    fetchCampaigns();
-  }, [setCampaigns]);
+  
 
   return (
     <div>
