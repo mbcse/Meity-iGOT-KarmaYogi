@@ -292,6 +292,9 @@ campaignRouter.post(
             data: { noOfEmails: { increment: 1 } },
           });
           console.log(differenceInDays(scheduledTime, currentTime))
+          req.body.work_type = "email";
+          req.body.sub_campaign_id = campaignData.id;
+
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             await handleQueueRequest(req, res, addEmailToQueue, 'Email added to queue', "emaillist");
           }
@@ -324,6 +327,10 @@ campaignRouter.post(
             where: { id: campaignID },
             data: { noOfSMS: { increment: 1 } },
           });
+
+          req.body.work_type = "SMS";
+          req.body.sub_campaign_id = campaignData.id;
+
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             await handleQueueRequest(req, res, addSMSToQueue, 'SMS added to queue', "smslist");
           }
@@ -350,6 +357,10 @@ campaignRouter.post(
             where: { id: campaignID },
             data: { noOfWhatsApp: { increment: 1 } },
           });
+
+          req.body.work_type = "whatsapp";
+          req.body.sub_campaign_id = campaignData.id;
+
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             await handleQueueRequest(req, res, addWhatsappToQueue, 'Whatsapp added to queue', "whatsapplist");
           }
