@@ -4,9 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import CampSlider from '@/components/atoms/Campaigns/CampSlider/CampSlider';
 import { Button } from '@/components/ui/button';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
-import WhatsappCampaignCreate from '@/forms/Whatsapp/WhatsappCampaignCreate';
-import EmailCampaignCreate from '@/forms/Email/EmailCampaignCreate';
-import SMSCampaignCreate from '@/forms/SMS/SMSCampaignCreate';
+import SubCampaignForm from '@/forms/SubCampaignForm';
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -18,13 +16,35 @@ export default function Page() {
   const create = searchParams.get("create");
   const router = useRouter();
 
+  const numbers = [
+    {
+      value: "9554848382",
+      label: "9554848382",
+    },
+    {
+      value: "4535355532",
+      label: "4535355532",
+    },
+  ];
+
+  const emails = [
+    {
+      value: "somemail@ok.com",
+      label: "somemail@ok.com",
+    },
+    {
+      value: "nice@jio.do",
+      label: "nice@jio.do",
+    },
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:3010/campaigns/${params.campaignid}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        console.log('Fetched campCardParentData:', data); // Debugging line
+        console.log('Fetched campCardParentData:', data);
         setCampCardParentData(data);
         setWhatsappCampaigns(data.whatsappCampaign);
         setEmailCampaigns(data.emailCampaign);
@@ -56,11 +76,11 @@ export default function Page() {
   const renderCreateForm = () => {
     switch (create) {
       case 'whatsapp':
-        return <WhatsappCampaignCreate campaignId={campCardParentData.id} />;
+        return <SubCampaignForm emails={emails} numbers={numbers} campaignType='whatsapp' campaignId={campCardParentData.id} />;
       case 'email':
-        return <EmailCampaignCreate campaignId={campCardParentData.id} />;
+        return <SubCampaignForm emails={emails} numbers={numbers} campaignType='email' campaignId={campCardParentData.id} />;
       case 'sms':
-        return <SMSCampaignCreate campaignId={campCardParentData.id} />;
+        return <SubCampaignForm emails={emails} numbers={numbers} campaignType='sms' campaignId={campCardParentData.id} />;
       default:
         return null;
     }
@@ -79,10 +99,6 @@ export default function Page() {
             <h1 className='text-4xl font-bold'>{campCardParentData.campaignName}</h1>
             <div className='flex gap-4 mt-4'>
               <div className='flex flex-col'>
-                <div className='flex items-center gap-2'>
-                  <span className='text-gray-500'>Status:</span>
-                  <span className='font-semibold'>{campCardParentData.status}</span>
-                </div>
                 <div className='flex items-center gap-2'>
                   <span className='text-gray-500'>Created:</span>
                   <span>{new Date(campCardParentData.timeCreate).toLocaleDateString()}</span>

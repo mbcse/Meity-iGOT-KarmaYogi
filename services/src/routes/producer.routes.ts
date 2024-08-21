@@ -9,7 +9,8 @@ export async function handleQueueRequest(req: Request, res: Response, addToQueue
         const payload = req.body;
         console.log(payload);
 
-        const bucket = payload.bucketName;
+        const bucket = payload.bucket;
+        console.log("bucket :  ", bucket);
         const response = await axios.post(`http://localhost:3000/api/db/showview/get${typeOfList}`, { bucketName: bucket });
         console.log("response", response.data);
 
