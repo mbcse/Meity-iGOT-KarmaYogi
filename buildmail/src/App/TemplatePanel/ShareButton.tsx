@@ -9,7 +9,7 @@ export default function ShareButton() {
   const [open, setOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [isSaveAs, setIsSaveAs] = useState(false);
-  const [showSaveCurrent, setShowSaveCurrent] = useState(true); // State to control visibility of the "Save current template" button
+  const [showSaveCurrent, setShowSaveCurrent] = useState(true);
 
   // Extract and decode the template name from URL
   useEffect(() => {
@@ -20,22 +20,18 @@ export default function ShareButton() {
       setShowSaveCurrent(!!nameFromUrl);
     };
   
-    // Initial hash check
     handleHashChange();
-  
-    // Add hash change listener
     window.addEventListener('hashchange', handleHashChange);
   
-    // Cleanup listener on component unmount
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   const onClick = (saveAs: boolean) => {
     setIsSaveAs(saveAs);
     if (saveAs) {
-      setOpen(true); // Show the input field for "Save As"
+      setOpen(true);
     } else {
-      onSubmit(); // Directly save using the existing template name from URL
+      onSubmit();
     }
   };
 
@@ -48,7 +44,7 @@ export default function ShareButton() {
 
     try {
       const response = await fetch(url, {
-        method: isSaveAs ? 'POST' : 'PUT', // POST for new template, PUT for updating existing
+        method: isSaveAs ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -60,8 +56,9 @@ export default function ShareButton() {
         console.log(data);
         setMessage(isSaveAs ? 'Template saved as new file.' : 'Template updated successfully.');
       } else {
-        console.error('Failed to upload template:', response.statusText);
-        setMessage('Failed to save the template.');
+        const errorData = await response.json();
+        console.error('Failed to upload template:', errorData);
+        setMessage(`Failed to save the template: ${errorData.message || response.statusText}`);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -77,7 +74,7 @@ export default function ShareButton() {
 
   return (
     <>
-      {open && (
+        {open && (
         <Card
           style={{
             position: 'absolute',
@@ -95,29 +92,30 @@ export default function ShareButton() {
             fullWidth
           />
           <Button onClick={onSubmit} variant="contained" color="primary" style={{ marginTop: 10 }} fullWidth>
-            Save As
+            Save 
           </Button>
         </Card>
       )}
 
-      {/* Show "Save current template" only if templateName is present */}
       {showSaveCurrent && (
-        <IconButton onClick={() => onClick(false)}>
-          <Tooltip title="Save current template">
-            <IosShareOutlined fontSize="small" />
-          </Tooltip>
-        </IconButton>
+        <Button 
+          variant="contained"
+            color="primary"
+        onClick={() => onClick(false)}>
+            Save Changes
+        </Button>
       )}
 
-      <IconButton onClick={() => onClick(true)}>
-        <Tooltip title="Save As">
-          <IosShareOutlined fontSize="small" />
-        </Tooltip>
-      </IconButton>
+      <Button
+           variant="contained"
+            color="primary"
+      onClick={() => onClick(true)}>
+          Save As
+      </Button>
 
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message !== null}
+        open={!!message}
         onClose={onClose}
         message={message}
       />
