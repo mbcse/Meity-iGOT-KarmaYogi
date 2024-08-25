@@ -1,13 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { TrendingUp } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -19,40 +17,45 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { browser: "Whatsapp", visitors: 275, fill: "var(--color-whatsapp)" },
-  { browser: "SMS", visitors: 200, fill: "var(--color-sms)" },
-  { browser: "Email", visitors: 287, fill: "var(--color-email)" },
-]
-
+// Sample chartConfig
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
   whatsapp: {
     label: "Whatsapp",
     color: "hsl(var(--chart-1))",
   },
   sms: {
-    label: "Safari",
+    label: "SMS",
     color: "hsl(var(--chart-2))",
   },
   email: {
-    label: "Firefox",
+    label: "Email",
     color: "hsl(var(--chart-3))",
   }
 } satisfies ChartConfig
 
-export function TotalVisitorPie() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  }, [])
+interface NumberOfXCommWiseProps {
+  X: string;
+  data: {
+    email: number;
+    sms: number;
+    whatsapp: number;
+  };
+}
+
+export function NumberOfXCommWise({ X, data }: NumberOfXCommWiseProps) {
+  // Convert the data object into a format suitable for the Pie chart
+  const chartData = [
+    { channel: "Whatsapp", count: data.whatsapp, fill: chartConfig.whatsapp.color },
+    { channel: "SMS", count: data.sms, fill: chartConfig.sms.color },
+    { channel: "Email", count: data.email, fill: chartConfig.email.color },
+  ]
+
+  const total = chartData.reduce((acc, curr) => acc + curr.count, 0)
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col max-w-sm">
       <CardHeader className="items-center pb-0">
-        <CardTitle>No of visitors - Communication wise</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>No of {X} - Communication wise</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -66,8 +69,8 @@ export function TotalVisitorPie() {
             />
             <Pie
               data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
+              dataKey="count"
+              nameKey="channel"
               innerRadius={60}
               strokeWidth={5}
             >
@@ -86,18 +89,19 @@ export function TotalVisitorPie() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {total.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          {X}
                         </tspan>
                       </text>
                     )
                   }
+                  return null;
                 }}
               />
             </Pie>
@@ -105,11 +109,8 @@ export function TotalVisitorPie() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+        <div className="leading-none text-muted-foreground text-center">
+          Showing total {X} for the campaign in different communication channels.
         </div>
       </CardFooter>
     </Card>

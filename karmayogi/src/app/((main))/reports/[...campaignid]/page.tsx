@@ -1,55 +1,51 @@
-import React from 'react'
-import {TotalVisitorPie} from '@/components/charts/TotalVisitorPie'
-import { Devices } from './components/Devices'
-import {CampaignWiseDevices} from '@/components/charts/CampaignWiseDevices'
-import { I_GlobalChart_EmailTitleComparision, EmailTitleComparision } from './components/EmailTitleComparision'
-export default function page({params}:{params:{campaign:string}}) {
-// Example dynamic data
-const campaignData:  I_GlobalChart_EmailTitleComparision[] = [
-  {
-    campaignName: "Campaign 1",
-    targeted: 1000,
-    bounced: 100,
-    opened: 800,
-    mobile: 400,
-    desktop: 500,
-    linkConversion: 700,
-  },
-  {
-    campaignName: "Campaign 2",
-    targeted: 2000,
-    bounced: 200,
-    opened: 1600,
-    mobile: 800,
-    desktop: 1000,
-    linkConversion: 1400,
-  },
-  {
-    campaignName: "Campaign 3",
-    targeted: 3000,
-    bounced: 300,
-    opened: 2400,
-    mobile: 1200,
-    desktop: 1500,
-    linkConversion: 2100,
-  }
-  // Additional campaigns can be added here
-]
-  
-  return (
-    <div className='flex flex-col px-8 py-4'>
-      <div>
-        <h1 className='text-3xl p-4 font-medium'>
-        {params.campaign}
-        </h1>
-      </div>
+import { NumberOfXCommWise } from '@/components/charts/NumberOfXCommWise';
+import { EmailTitleComparision } from './components/EmailTitleComparision';
+import { AggFields } from '../utils/AggFields';
+import { SubCampaignTable } from '@/components/atoms/Reports/SubCampaignTable';
 
-      <div className='flex  gap-6 scroll-smooth select-none scrollbar  overflow-y-auto p-6'>
-        <CampaignWiseDevices />
-        <TotalVisitorPie />
-        <EmailTitleComparision data={campaignData} />
+export default async function Page({ params }: { params: { campaignid: string } }) {
+    const response = await fetch(`http://localhost:3010/stats/campaign/${params.campaignid}`, {
+        cache: 'no-store', // Ensures fresh data on every request
+    });
 
-      </div>
-    </div>
-  )
+    if (!response.ok) {
+        return <div>Failed to load data</div>;
+    }
+
+    const campaignNameandData = await response.json();
+
+    const aggregatedData_Targetted = AggFields(campaignNameandData, 'targeted');
+    const aggregatedData_Bounced = AggFields(campaignNameandData, 'bounced');
+    const aggregatedData_LinkConversion = AggFields(campaignNameandData, 'linkConversion');
+
+    return (
+        <div className='flex flex-col px-8 py-4'>
+            <div>
+                <h1 className='text-3xl p-4 font-medium'>
+                    {campaignNameandData.campaignName} Report
+                </h1>
+            </div>
+
+            <div className='flex flex-col gap-2 scroll-smooth select-none scrollbar overflow-y-auto p-6'>
+                <div className='flex gap-2'>
+                    <NumberOfXCommWise X={"Targetted"} data={aggregatedData_Targetted} />
+                    <NumberOfXCommWise X={"Bounced"} data={aggregatedData_Bounced} />
+                </div>
+                <div>
+                    <EmailTitleComparision data={campaignNameandData.subCampaigns.email} />
+                </div>
+                <div className='pt-4'>
+                    <div className='flex flex-col'>
+                        <SubCampaignTable title="Email Campaigns" subCampaigns={campaignNameandData.subCampaigns.email} />
+                    </div>
+                    <div>
+                        <SubCampaignTable title="SMS Campaigns" subCampaigns={campaignNameandData.subCampaigns.sms} />
+                    </div>
+                    <div>
+                        <SubCampaignTable title="Whatsapp Campaigns" subCampaigns={campaignNameandData.subCampaigns.whatsapp} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
