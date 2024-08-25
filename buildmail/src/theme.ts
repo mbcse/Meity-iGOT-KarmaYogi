@@ -1,7 +1,5 @@
 import { alpha, createTheme, darken, lighten } from '@mui/material/styles';
 
-const BRAND_NAVY = '#212443';
-const BRAND_BLUE = '#0079CC';
 const BRAND_GREEN = '#1F8466';
 const BRAND_RED = '#E81212';
 const BRAND_YELLOW = '#F6DC9F';
@@ -30,8 +28,8 @@ const BASE_THEME = createTheme({
 const THEME = createTheme(BASE_THEME, {
   palette: {
     brand: {
-      navy: BRAND_NAVY,
-      blue: BRAND_BLUE,
+      navy: '#5456DB',
+      blue: '#5456DB',
       red: BRAND_RED,
       green: BRAND_GREEN,
       yellow: BRAND_YELLOW,
@@ -63,10 +61,10 @@ const THEME = createTheme(BASE_THEME, {
       500: BRAND_YELLOW,
     },
     info: {
-      main: BRAND_BLUE,
+      main: '#5456DB',
     },
     primary: {
-      main: BRAND_BLUE,
+      main: '#5456DB',
     },
   },
   components: {
@@ -235,7 +233,7 @@ const THEME = createTheme(BASE_THEME, {
           width: 16,
           cursor: 'col-resize',
           '&:hover, &.Mui-active, &.Mui-focusVisible': {
-            boxShadow: `0 0 0 4px ${alpha(BRAND_BLUE, 0.2)}`,
+            boxShadow: `0 0 0 4px ${alpha('#5456DB', 0.2)}`,
           },
           '&:before': {
             display: 'none',
@@ -287,6 +285,16 @@ const THEME = createTheme(BASE_THEME, {
         },
         textSecondary: {
           color: BASE_THEME.palette.text.secondary,
+        },
+        containedPrimary: {
+          backgroundColor: '#5456DB', 
+          color: '#ffffff', 
+          '&:hover, &:active': {
+            backgroundColor: darken('#5456DB', 0.1), 
+          },
+          '&:focus': {
+            boxShadow: `0 0 0 4px ${alpha('#5456DB', 0.2)}`,
+          },
         },
         outlinedPrimary: {
           borderColor: BASE_THEME.palette.grey[300],
