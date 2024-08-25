@@ -234,7 +234,102 @@ statsRouter.get("/:campaignID/bounces/:campaignType", async (req: Request, res: 
 });
 
 
-
+statsRouter.get('/campaign/:campaignId', async (req, res) => {
+    const { campaignId } = req.params;
+  
+    try {
+      // Fetch the campaign with related sub-campaigns
+      const campaign = await prisma.campaign.findUnique({
+        where: { id: campaignId },
+        include: {
+          whatsappCampaign: true,
+          smsCampaign: true,
+          emailCampaign: true,
+        },
+      });
+  
+      if (!campaign) {
+        return res.status(404).json({ error: 'Campaign not found' });
+      }
+  
+      // Map the campaign data to the required structure
+      const result = {
+        campaignName: campaign.campaignName,
+        subCampaigns: {
+          whatsapp: campaign.whatsappCampaign.map((subCampaign) => ({
+            subCampaignName: subCampaign.campaignTitle,
+            targeted: subCampaign.targeted,
+            bounced: subCampaign.bounced,
+            opened: subCampaign.targeted - subCampaign.bounced, // assuming opened is targeted minus bounced
+            mobile: subCampaign.regionsClicks.filter(region => region === 'mobile').length, // assuming mobile/desktop differentiation
+            desktop: subCampaign.regionsClicks.filter(region => region === 'desktop').length,
+          })),
+          sms: campaign.smsCampaign.map((subCampaign) => ({
+            subCampaignName: subCampaign.campaignTitle,
+            targeted: subCampaign.targeted,
+            bounced: subCampaign.bounced,
+            opened: subCampaign.targeted - subCampaign.bounced,
+            mobile: subCampaign.regionsClicks.filter(region => region === 'mobile').length,
+            desktop: subCampaign.regionsClicks.filter(region => region === 'desktop').length,
+          })),
+          email: campaign.emailCampaign.map((subCampaign) => ({
+            subCampaignName: subCampaign.campaignTitle,
+            targeted: subCampaign.targeted,
+            bounced: subCampaign.bounced,
+            opened: subCampaign.opened,
+            mobile: subCampaign.mobile,
+            desktop: subCampaign.desktop,
+          })),
+        },
+      };
+  
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while fetching campaign data' });
+    }
+  });
+  
+statsRouter.get('/total-stats', async (req, res) => {
+    try {
+      // Fetch all campaigns with their related sub-campaigns
+      const campaigns = await prisma.campaign.findMany({
+        include: {
+          whatsappCampaign: true,
+          smsCampaign: true,
+          emailCampaign: true,
+        },
+      });
+  
+      // Initialize total stats
+      let totalTargeted = 0;
+      let totalBounced = 0;
+  
+      // Aggregate stats from all sub-campaigns
+      campaigns.forEach(campaign => {
+        campaign.whatsappCampaign.forEach(subCampaign => {
+          totalTargeted += subCampaign.targeted;
+          totalBounced += subCampaign.bounced;
+        });
+  
+        campaign.smsCampaign.forEach(subCampaign => {
+          totalTargeted += subCampaign.targeted;
+          totalBounced += subCampaign.bounced;
+        });
+  
+        campaign.emailCampaign.forEach(subCampaign => {
+          totalTargeted += subCampaign.targeted;
+          totalBounced += subCampaign.bounced;
+        });
+      });
+  
+      // Send response with the total stats
+      res.json({ totalTargeted, totalBounced });
+    } catch (error) {
+      console.error('Error calculating stats:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
 
 export default statsRouter;
