@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { IosShareOutlined } from '@mui/icons-material';
 import { IconButton, Snackbar, Tooltip, Card, TextField, Button } from '@mui/material';
 import { useDocument } from '../../documents/editor/EditorContext';
@@ -8,38 +8,65 @@ export default function ShareButton() {
   const [message, setMessage] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  const [isSaveAs, setIsSaveAs] = useState(false);
+  const [showSaveCurrent, setShowSaveCurrent] = useState(true);
 
-  const onClick = () => {
-    setOpen(true);
+  // Extract and decode the template name from URL
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      const nameFromUrl = hash ? decodeURIComponent(hash.split('/')[1]) : '';
+      setTemplateName(nameFromUrl || '');
+      setShowSaveCurrent(!!nameFromUrl);
+    };
+  
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+  
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const onClick = (saveAs: boolean) => {
+    setIsSaveAs(saveAs);
+    if (saveAs) {
+      setOpen(true);
+    } else {
+      onSubmit();
+    }
   };
 
   const onSubmit = useCallback(async () => {
     const plainJSON = JSON.stringify(document, null, '  ');
 
+    const url = isSaveAs 
+      ? 'http://localhost:3010/templates/upload/nocode' 
+      : 'http://localhost:3010/templates/update/nocode';
+
     try {
-      const response = await fetch('http://localhost:3010/templates/upload/nocode', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method: isSaveAs ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ plainJSON: plainJSON, templateName: templateName }),
+        body: JSON.stringify({ plainJSON, templateName }),
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        setMessage('The URL was updated. Copy it to share your current template.');
+        setMessage(isSaveAs ? 'Template saved as new file.' : 'Template updated successfully.');
       } else {
-        console.error('Failed to upload template:', response.statusText);
-        setMessage('Failed to upload template.');
+        const errorData = await response.json();
+        console.error('Failed to upload template:', errorData);
+        setMessage(`Failed to save the template: ${errorData.message || response.statusText}`);
       }
     } catch (error) {
       console.error('Error:', error);
-      setMessage('An error occurred while uploading the template.');
+      setMessage('An error occurred while saving the template.');
     } finally {
       setOpen(false);
     }
-  }, [document, templateName]);
+  }, [document, templateName, isSaveAs]);
 
   const onClose = () => {
     setMessage(null);
@@ -47,7 +74,7 @@ export default function ShareButton() {
 
   return (
     <>
-      {open && (
+        {open && (
         <Card
           style={{
             position: 'absolute',
@@ -59,24 +86,36 @@ export default function ShareButton() {
           }}
         >
           <TextField
-            label="Template Name"
+            label="New Template Name"
             value={templateName}
             onChange={(e) => setTemplateName(e.target.value)}
             fullWidth
           />
           <Button onClick={onSubmit} variant="contained" color="primary" style={{ marginTop: 10 }} fullWidth>
-            Submit
+            Save 
           </Button>
         </Card>
       )}
-      <IconButton onClick={onClick}>
-        <Tooltip title="Save current template">
-          <IosShareOutlined fontSize="small" />
-        </Tooltip>
-      </IconButton>
+
+      {showSaveCurrent && (
+        <Button 
+          variant="contained"
+            color="primary"
+        onClick={() => onClick(false)}>
+            Save Changes
+        </Button>
+      )}
+
+      <Button
+           variant="contained"
+            color="primary"
+      onClick={() => onClick(true)}>
+          Save As
+      </Button>
+
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message !== null}
+        open={!!message}
         onClose={onClose}
         message={message}
       />
