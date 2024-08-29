@@ -13,7 +13,9 @@ export interface SelectedChatAtomProps {
     messageID: string;
     date: Date;
     subject: string;
+    thread?: string;  // Add this line
 }
+
 
 export const chatCommTypeAtom = atom<CommType>(CommType.Mail);
 export const selectedChatAtom = atom<SelectedChatAtomProps|null>(null);
