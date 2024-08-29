@@ -1,43 +1,53 @@
-import { PutObjectCommand,GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import 'dotenv/config';
+import { AWSAccessKey, AWSSecretKey, s3Region } from '../workers/config'; // Import config
 
+// Initialize the S3 client using config values
 const s3Client = new S3Client({
-    region: process.env.AWS_S3_REGION,
+    region: s3Region,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY as string,
-      secretAccessKey: process.env.AWS_SECRET as string,
+      accessKeyId: AWSAccessKey as string,
+      secretAccessKey: AWSSecretKey as string,
     },
 });
 
-export const uploadFile = async (buffer:Buffer,fileName:string ,bucket: string) => {
+console.log("S3 Client: ", {
+    region: s3Region,
+    credentials: {
+      accessKeyId: AWSAccessKey,
+      secretAccessKey: AWSSecretKey,
+    }
+});
+
+export const uploadFile = async (buffer: Buffer, fileName: string, bucket: string, isJSON : boolean) => {
     const params = {
         Bucket: bucket,
-        Key: "templates/json/"+fileName,
+        Key: isJSON?`templates/json/${fileName}`:`templates/html/${fileName}`,
         Body: buffer,
-        ContentType: 'text/json',
+        ContentType: isJSON?'application/json':'text/html',
     };
 
-    console.log("Uploading file to S3",params);
+    console.log("Uploading file to S3", params);
 
     try {
         const data = await s3Client.send(new PutObjectCommand(params));
         return data;
     } catch (error) {
         console.error('Error uploading file:', error);
-        return error;
+        throw error;
     }
 };
 
-export const downloadFile = async (bucket: string, fileName: string): Promise<any> => {
+export const downloadFile = async (bucket: string, fileName: string,isJSON:boolean): Promise<any> => {
     const params = {
         Bucket: bucket,
-        Key: `templates/json/${fileName}`,
+        Key: isJSON?`templates/json/${fileName}.json`:`templates/html/${fileName}.html`,
     };
 
+    console.log("Downloading file from S3", params);
     try {
         const data: GetObjectCommandOutput = await s3Client.send(new GetObjectCommand(params));
-
+        console.log("ObjData: ",data);
         if (!data.Body || !(data.Body instanceof Readable)) {
             throw new Error('Invalid response from S3');
         }
@@ -52,12 +62,19 @@ export const downloadFile = async (bucket: string, fileName: string): Promise<an
         };
 
         const value = await getReadableData(data.Body);
+        console.log("ReadableData: ",value);
+        
+        if(isJSON){
         const decodedJson = JSON.parse(value);
-        console.log(decodedJson);
+        console.log("\n\nDECODED JSON: ", decodedJson);
 
         return decodedJson;
+        }
+
+        console.log("HTML: ",value);
+        return value;
     } catch (error) {
         console.error('Error downloading file:', error);
-        return error;
+        throw error;
     }
-}
+};

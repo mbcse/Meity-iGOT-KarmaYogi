@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect,useMemo } from 'react';
 import { IosShareOutlined } from '@mui/icons-material';
 import { IconButton, Snackbar, Tooltip, Card, TextField, Button } from '@mui/material';
 import { useDocument } from '../../documents/editor/EditorContext';
+import { renderToStaticMarkup } from '@usewaypoint/email-builder';
 
 export default function ShareButton() {
   const document = useDocument();
@@ -10,6 +11,7 @@ export default function ShareButton() {
   const [templateName, setTemplateName] = useState('');
   const [isSaveAs, setIsSaveAs] = useState(false);
   const [showSaveCurrent, setShowSaveCurrent] = useState(true);
+    const code = useMemo(() => renderToStaticMarkup(document, { rootBlockId: 'root' }), [document]);
 
   // Extract and decode the template name from URL
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function ShareButton() {
     const plainJSON = JSON.stringify(document, null, '  ');
 
     const url = isSaveAs 
-      ? 'http://localhost:3010/templates/upload/nocode' 
+      ? 'http://localhost:3010/templates/upload/nocode'  
       : 'http://localhost:3010/templates/update/nocode';
 
     try {
@@ -48,7 +50,7 @@ export default function ShareButton() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ plainJSON, templateName }),
+        body: JSON.stringify({ plainJSON, code, templateName }),
       });
 
       if (response.ok) {
