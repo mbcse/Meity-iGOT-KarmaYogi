@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 import { addEmailToQueue, addSMSToQueue, addWhatsappToQueue, addEmailToQueue_NonCampaign } from '../utils/producers';
 import axios from 'axios';
-
+import { CampaignStatus, PrismaClient } from '@prisma/client';
 const producerRouter = express.Router();
+const prisma = new PrismaClient();
+
 
 export async function handleQueueRequest(
     req: Request, 
@@ -41,8 +43,10 @@ export async function handleQueueRequest(
 
         console.log("\nqueue_payload", queue_payload);
 
-        await addToQueue(queue_payload);
+        const addedToQueue = await addToQueue(queue_payload);
 
+
+        console.log("added to queue : " ,addedToQueue);
         // Ensure the response is sent in JSON format
         return JSON.stringify({ message: successMessage });
     } catch (error) {

@@ -1,5 +1,6 @@
 import { Worker } from 'bullmq';
 import nodemailer from 'nodemailer';
+import { CampaignStatus, PrismaClient } from '@prisma/client';
 import { getEmailInfo } from '../utils/email.utils';
 import { IRedisEmailValues } from '../utils/cache.utils';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
@@ -10,34 +11,41 @@ import {
   emailWorkerPassword,
 } from './config'; // Import the variables from the config file
 
+const prisma = new PrismaClient();
 const redisConnection = { host: 'localhost', port: 4003 };
 
 const transporterOptions: SMTPTransport.Options = {
-    host: smtpHostUri,
-    port: parseInt(smtpPort as string),
-    secure: true, // Use SSL/TLS
-    auth: {
-      user: emailWorkerEmail,
-      pass: emailWorkerPassword,
-    },
-  };
+  host: smtpHostUri,
+  port: parseInt(smtpPort as string),
+  secure: true, // Use SSL/TLS
+  auth: {
+    user: emailWorkerEmail,
+    pass: emailWorkerPassword,
+  },
+  dsn: {
+    notify: ['FAILURE', 'DELAY'],
+    orcpt: 'bounced@shecodehacks.com'
+  },
+};
 
-  console.log("Transporter Options: ", transporterOptions);
-// Initialize Worker
+console.log("Transporter Options: ", transporterOptions);
+
+let sentEmailCount = 0; // Counter for successful emails
+
 const emailWorker = new Worker('email-qu', async (job) => {
   console.log("In email worker");
   console.log(job);
 
   const { item, template }: { item: string; template: string } = job.data;
-  console.log(`Processing email job for ${item}`);
   const campaign_id = job.name;
-  console.log(`Campaign ID: ${campaign_id}`);
 
-  const { title, body } = await getEmailInfo(campaign_id, template) as IRedisEmailValues;
-  console.log(`Email title: ${title}`);
-  console.log(`Email body: ${body}`);
+  // Update campaign status to "running"
+  await prisma.emailCampaign.update({
+    where: { id: campaign_id },
+    data: { status: CampaignStatus.running },
+  });
 
-
+  const { body, title } = await getEmailInfo(campaign_id, template) as IRedisEmailValues;
   const transporter = nodemailer.createTransport(transporterOptions);
 
   try {
@@ -45,36 +53,68 @@ const emailWorker = new Worker('email-qu', async (job) => {
       from: 'info@shecodeshacks.com',
       to: item,
       subject: title,
-      html: body,
+      html: body,     
     });
 
-    // Uncomment to actually send the email
     await transporter.sendMail({
       from: 'info@shecodeshacks.com',
       to: item,
       subject: title,
       html: body,
+      headers: {
+        'Return-Path': 'bounced@shecodeshacks.com', // Set the Return-Path header
+        'X-Campaign-id': campaign_id // Set the X-Campaign-id header
+      }
     });
 
-    console.log(`Email sent to ${item}`);
+    console.log(`Mail sent to ${item}`);
+    sentEmailCount++; // Increment the counter for successful email
+
   } catch (error) {
     console.error(`Failed to send email to ${item}:`, error);
-    throw error;
+    throw new Error(`Failed to send emails for campaign ${campaign_id}`);
   }
 
-  console.log("email sent");
 }, { connection: redisConnection });
 
-emailWorker.on('failed', (job, err) => {
+// Event listener for when the job fails
+emailWorker.on('failed', async (job, err) => {
+  console.log("Inside failed event listener");
+  console.log(job);
   if (job) {
     console.error(`Job ${job.id} failed with error ${err.message}`);
+    // Update the campaign status to 'failed' on job failure
+    await prisma.emailCampaign.update({
+      where: { id: job.name },
+      data: { status: CampaignStatus.failed },
+    });
   } else {
     console.error(`Job failed with error ${err.message}`);
   }
 });
 
+// Event listener for when the job completes successfully
+emailWorker.on('completed', async (job) => {
+  console.log("Inside completed event listener");
+  console.log(job);
+  console.log("Total emails sent: ", sentEmailCount);
+  if (job) {
+    console.log(`Job ${job.id} completed successfully.`);
+    // Update the campaign status to 'completed' and update the targeted email count
+    await prisma.emailCampaign.update({
+      where: { id: job.name },
+      data: {
+        status: CampaignStatus.completed, // Set the status to 'completed'
+        targeted: sentEmailCount, // Set the count of successfully sent emails
+      },
+    });
+    console.log(`Email processing completed successfully. Total emails sent: ${sentEmailCount}`);
+  }
+});
+
+// Event listener for when the worker is ready
 emailWorker.on('ready', () => {
-  console.log("ready");
+  console.log("Email worker ready");
 });
 
 console.log('Email worker started');

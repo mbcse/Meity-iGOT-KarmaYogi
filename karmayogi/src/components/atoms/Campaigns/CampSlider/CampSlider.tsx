@@ -42,6 +42,8 @@ export default function CampSlider({
     return `${day}/${month}/${year}`;
   };
 
+  console.log(campaignCards);
+
   return (
     <div className="p-8 overflow-auto scrollbar">
       <div className="flex gap-3">
@@ -70,11 +72,11 @@ export default function CampSlider({
               <div className="flex justify-between items-center p-2 rounded-md">
                 <div className="flex items-center justify-between w-full">
                   <div>
-                    <div className="flex gap-2">
-                      <Users />
-                      {campaignCard.targeted}
-                    </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 bg-[#5456DB]/70 text-white rounded-full px-4 py-1">
+                     
+                      {campaignCard.bucket.name}
+                    </div>  
+                    <div className="flex gap-2 px-2">
                       <span>{newDate(campaignCard.scheduled)}</span>
                       <span>{campaignCard.timeToBeSent}</span>
                     </div>

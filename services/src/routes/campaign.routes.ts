@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma, CampaignStatus } from "@prisma/client";
 import express, { Request, Response } from "express";
 import { differenceInDays, isBefore } from 'date-fns';
 import axios from "axios";
@@ -30,28 +30,107 @@ campaignRouter.get("/", async (req: Request, res: Response) => {
 });
 
 
-campaignRouter.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  
+campaignRouter.get('/:campaignID', async (req, res) => {
+  const { campaignID } = req.params;
+
   try {
     const campaign = await prisma.campaign.findUnique({
-      where: { id },
-      include: {
-        whatsappCampaign: true,
-        smsCampaign: true,
-        emailCampaign: true
-      }
+      where: {
+        id: campaignID,
+      },
+      select: {
+        id: true,
+        campaignName: true,
+        timeCreate: true,
+        noOfEmails: true,
+        noOfSMS: true,
+        noOfWhatsApp: true,
+        noOfUsers: true,
+        status: true,
+        campaignType: true,
+        emailCampaign: {
+          select: {
+            id: true,
+            campaignTitle: true,
+            bucketID: true,
+            mailbody: true,
+            fromMail: true,
+            status: true,
+            scheduled: true,
+            timeToBeSent: true,
+            targeted: true,
+            opened: true,
+            bounced: true,
+            unsubscribed: true,
+            spamReports: true,
+            desktop: true,
+            mobile: true,
+            regionsClicks: true,
+            bucket: {
+              select: {
+                name: true,
+                changedName: true,
+              },
+            },
+          },
+        },
+        smsCampaign: {
+          select: {
+            id: true,
+            campaignTitle: true,
+            bucketID: true,
+            Number: true,
+            SMSBody: true,
+            status: true,
+            scheduled: true,
+            timeToBeSent: true,
+            targeted: true,
+            bounced: true,
+            unsubscribed: true,
+            regionsClicks: true,
+            bucket: {
+              select: {
+                name: true,
+                changedName: true,
+              },
+            },
+          },
+        },
+        whatsappCampaign: {
+          select: {
+            id: true,
+            campaignTitle: true,
+            bucketID: true,
+            Number: true,
+            textbody: true,
+            status: true,
+            scheduled: true,
+            timeToBeSent: true,
+            targeted: true,
+            bounced: true,
+            unsubscribed: true,
+            regionsClicks: true,
+            bucket: {
+              select: {
+                name: true,
+                changedName: true,
+              },
+            },
+          },
+        },
+      },
     });
-
+  
     if (!campaign) {
       return res.status(404).json({ error: 'Campaign not found' });
     }
-
+  
     return res.json(campaign);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred while fetching the campaign' });
+    return res.status(500).json({ error: 'An error occurred while fetching the campaign' });
   }
+  
 });
 
 campaignRouter.get(
@@ -250,7 +329,6 @@ campaignRouter.post(
     const { email, number, template, scheduled, campaignName, bucket, time, message } = req.body;
     console.log(req.body);
 
-  
     // Validate common fields
     if ((!template && !message) || !scheduled || !campaignName || !bucket || !time) {
       return res.status(400).json({ error: "All fields are required" });
@@ -264,14 +342,15 @@ campaignRouter.post(
 
     // Parse the combined string into a Date object
     const validDate = new Date(dateTimeString);
-    console.log("Valid date : ",validDate);
+    console.log("Valid date:", validDate);
+
     // Check if the date is valid
     if (isNaN(validDate.getTime())) {
       return res.status(400).json({ message: "Invalid date or time" });
     }
 
     try {
-      const bucketChangedName = (await checkAndUpdateBucket(bucket)) as string;
+      const bucketChangedName = bucket;
       console.log("Bucket changed name:", bucketChangedName);
 
       const currentTime = new Date();
@@ -302,7 +381,12 @@ campaignRouter.post(
           req.body.sub_campaign_id = campaignData.id;
           req.body.validDate = validDate;
           if (differenceInDays(scheduledTime, currentTime) < 1) {
-            await handleQueueRequest(req, res, addEmailToQueue, 'Email added to queue', "emaillist");
+            if(await handleQueueRequest(req, res, addEmailToQueue, 'Email added to queue', "emaillist")) {
+              await prisma.emailCampaign.update({
+                where: { id: campaignData.id },
+                data: { status: CampaignStatus.queued },
+              });
+            }
           }
           break;
 
@@ -376,32 +460,20 @@ campaignRouter.post(
 );
 
 
+
 async function checkAndUpdateBucket(bucket: string) {
   try {
-    const _bucket = await prisma.buckets.findFirst({
+    const _bucketChangedName = await prisma.buckets.findFirst({
       where: {
-        name: bucket,
+        changedName: bucket,
       },
     });
 
-    if (_bucket) {
-      console.log(`Bucket already exists: ${_bucket}`); 
-      return _bucket.changedName;
+
+    if(!_bucketChangedName) {
+      return "";
     }
-
-    const newBucket = await prisma.buckets.create({
-      data: {
-        name: bucket,
-        changedName: bucket,
-        query: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    }); 
-
-    console.log(`New bucket created: ${newBucket}`);
-
-    return newBucket.changedName;
+    return _bucketChangedName.changedName;
   } catch (error) {
     console.error(error);
   }
