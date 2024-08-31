@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "server": "ts-node-dev --respawn --transpile-only ./src/server.ts",
-    "test": "jest /services/tests"
+    "test": "jest /services/tests",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "jest": {
     "testEnvironment": "node",

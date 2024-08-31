@@ -1,0 +1,53 @@
+name: Deploy services to EC2
+
+on:
+  push:
+    branches:
+      - dev  # Trigger the action on push to the dev branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./services  # Set the working directory to folder D
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build TypeScript code
+      run: npm run build
+
+    - name: Docker build and push
+      env:
+        DOCKER_IMAGE_NAME: your-dockerhub-username/folder-d-image  # Replace with your Docker Hub username and image name
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
+        docker build -t $DOCKER_IMAGE_NAME .
+        docker push $DOCKER_IMAGE_NAME
+
+    - name: Deploy to EC2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+        DOCKER_IMAGE_NAME: your-dockerhub-username/folder-d-image  # Replace with your Docker Hub username and image name
+      run: |
+        ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY $USER@$HOST << 'EOF'
+          docker pull $DOCKER_IMAGE_NAME
+          docker stop folder-d-container || true
+          docker rm folder-d-container || true
+          docker run -d --name folder-d-container -p 3000:3000 $DOCKER_IMAGE_NAME
+        EOF
