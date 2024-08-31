@@ -57,14 +57,15 @@ const emailWorker = new Worker('email-qu', async (job) => {
     });
 
     await transporter.sendMail({
-      from: 'info@shecodeshacks.com',
+      from: 'campaigns@shecodeshacks.com',
       to: item,
       subject: title,
       html: body,
       headers: {
         'Return-Path': 'bounced@shecodeshacks.com', // Set the Return-Path header
         'X-Campaign-id': campaign_id // Set the X-Campaign-id header
-      }
+      },
+      replyTo:"channels@shecodeshacks.com"
     });
 
     console.log(`Mail sent to ${item}`);
