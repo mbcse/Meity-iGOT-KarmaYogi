@@ -25,7 +25,7 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(false);
     const [currentBucket, setCurrentBucket] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false); // New state for dialog
-
+console.log("Query : ",query);
     const { toast } = useToast();
 
     useEffect(() => {

@@ -24,7 +24,7 @@ const logger = winston.createLogger({
     ],
 });
 
-export async function GET(res: NextResponse) {
+export async function GET(req:NextRequest,res: NextResponse) {
     try {
         return NextResponse.json({ message: "Welcome to the chat API" });
     } catch (error) {
@@ -56,11 +56,11 @@ export async function POST(req: NextRequest) {
             id            SERIAL PRIMARY KEY,
             name          TEXT NOT NULL,
             email         TEXT NOT NULL,
-            jobTitle      TEXT,
+            jobtitle      TEXT,
             gender        TEXT,
             number        TEXT,
-            officeStartTime    TEXT,
-            officeEndTime    TEXT,
+            officestarttime    TEXT,
+            officeendtime    TEXT,
             location      TEXT,
             birthday    TIMESTAMP
         );

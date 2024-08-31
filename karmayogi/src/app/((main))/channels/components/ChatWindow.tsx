@@ -14,7 +14,9 @@ const Loader = () => (
 
 interface Message {
   _id: string;
-  from: string;
+  from: {
+    address:string;
+  };
   to: string[];
   subject: string;
   htmlBody: string;
@@ -74,7 +76,7 @@ export default function ChatWindow() {
       setIsLoading(true);
     
       const newMessage: Omit<Message, '_id' | 'date'> & { __v: number } = {
-        from: emailId,
+        from: { address : emailId},
         to: selectedChat?.from ? [selectedChat.from] : [],
         subject: selectedChat?.subject || '',
         htmlBody: inputValue,

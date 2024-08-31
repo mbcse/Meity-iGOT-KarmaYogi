@@ -6,7 +6,7 @@ import { CommType } from '@/states/chat.atom';
 // Function to fetch stats data from the API
 async function fetchStats(): Promise<ReportCardProps[]> {
   try {
-    const response = await fetch('http://localhost:3010/stats/total-stats');
+    const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/stats/total-stats`);
     const data = await response.json();
 
     // Map the API response to ReportCardProps format

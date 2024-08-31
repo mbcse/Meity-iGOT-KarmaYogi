@@ -65,7 +65,7 @@ return (
     <Card className="flex flex-col min-w-[400px] w-full">
         <CardHeader className="items-center pb-0">
             <CardTitle>Radial Chart - Grid</CardTitle>
-            <CardDescription>Statistics for "20% off" campaign</CardDescription>
+            <CardDescription>Statistics for `&quot;`20% off`&quot;` campaign</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
             <ChartContainer

@@ -28,7 +28,7 @@ export default function CreateCampaignModal() {
       return;
     }
 
-    const response = await fetch('http://localhost:3010/campaigns/create', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/campaigns/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
