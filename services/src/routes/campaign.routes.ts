@@ -461,24 +461,5 @@ campaignRouter.post(
 
 
 
-async function checkAndUpdateBucket(bucket: string) {
-  try {
-    const _bucketChangedName = await prisma.buckets.findFirst({
-      where: {
-        changedName: bucket,
-      },
-    });
-
-
-    if(!_bucketChangedName) {
-      return "";
-    }
-    return _bucketChangedName.changedName;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-
 export default campaignRouter;
 

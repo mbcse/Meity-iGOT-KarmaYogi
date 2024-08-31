@@ -14,8 +14,8 @@ const app = express();
 
 app.use(express.json());
 
-// Define your allowed origins
-const allowedOrigins = ["http://localhost:3000", "http://localhost:3001","http://localhost:5173"]; // Add your React and Next.js app URLs here
+// Get allowed origins from .env file
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:3000", "http://localhost:3001","http://localhost:5173"]; 
 
 const corsOptions = {
   origin: function (origin: any, callback: any) {
