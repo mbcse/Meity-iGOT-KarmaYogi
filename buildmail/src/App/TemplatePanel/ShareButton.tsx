@@ -41,8 +41,8 @@ export default function ShareButton() {
     const plainJSON = JSON.stringify(document, null, '  ');
 
     const url = isSaveAs 
-      ? 'http://localhost:3010/templates/upload/nocode'  
-      : 'http://localhost:3010/templates/update/nocode';
+      ? `${import.meta.env.VITE_BACKEND_HOST}/templates/upload/nocode`  
+      : `${import.meta.env.VITE_BACKEND_HOST}/templates/update/nocode`;
 
     try {
       const response = await fetch(url, {
