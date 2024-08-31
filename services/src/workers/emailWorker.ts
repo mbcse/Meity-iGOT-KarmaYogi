@@ -1,68 +1,121 @@
 import { Worker } from 'bullmq';
 import nodemailer from 'nodemailer';
+import { CampaignStatus, PrismaClient } from '@prisma/client';
 import { getEmailInfo } from '../utils/email.utils';
 import { IRedisEmailValues } from '../utils/cache.utils';
-import dotenv from 'dotenv';
-
-dotenv.config({
-    path:'../../.env'
-});
-import 'dotenv/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import {
+  smtpHostUri,
+  smtpPort,
+  emailWorkerEmail,
+  emailWorkerPassword,
+} from './config'; // Import the variables from the config file
 
+const prisma = new PrismaClient();
 const redisConnection = { host: 'localhost', port: 4003 };
 
-// Initialize Worker
-const emailWorker = new Worker('email-qu', async job => {
-    const { email } = job.data;
-    const campaign_id = job.name; 
+const transporterOptions: SMTPTransport.Options = {
+  host: smtpHostUri,
+  port: parseInt(smtpPort as string),
+  secure: true, // Use SSL/TLS
+  auth: {
+    user: emailWorkerEmail,
+    pass: emailWorkerPassword,
+  },
+  dsn: {
+    notify: ['FAILURE', 'DELAY'],
+    orcpt: 'bounced@shecodehacks.com'
+  },
+};
 
-    
-    const {title,body} = await getEmailInfo(campaign_id) as IRedisEmailValues;
-    const transporterOptions:SMTPTransport.Options = {
-        host: process.env.SMTP_HOST_URI,
-        port: parseInt(process.env.SMTP_PORT as string),
-        secure: true,
-        // Use SSL/TLS
-        auth: {
-          user: process.env.EMAIL_WORKER_EMAIL,
-          pass: process.env.EMAIL_WORKER_PASSWORD
-        }
-      }
+console.log("Transporter Options: ", transporterOptions);
 
-      console.log(transporterOptions)
-    var transporter = nodemailer.createTransport(transporterOptions);
-    
-    try {
-        await transporter.sendMail({
-            from: 'info@shecodeshacks.com',
-            to: email,
-            subject: title,
-            html: body
-        });
-        console.log(`Email sent to ${email}`);
-    } catch (error) {
-        console.error(`Failed to send email to ${email}:`, error);
-        throw error;
-    }
+let sentEmailCount = 0; // Counter for successful emails
 
-    console.log("email sent")
+const emailWorker = new Worker('email-qu', async (job) => {
+  console.log("In email worker");
+  console.log(job);
+
+  const { item, template }: { item: string; template: string } = job.data;
+  const campaign_id = job.name;
+
+  // Update campaign status to "running"
+  await prisma.emailCampaign.update({
+    where: { id: campaign_id },
+    data: { status: CampaignStatus.running },
+  });
+
+  const { body, title } = await getEmailInfo(campaign_id, template) as IRedisEmailValues;
+  const transporter = nodemailer.createTransport(transporterOptions);
+
+  try {
+    console.log({
+      from: 'info@shecodeshacks.com',
+      to: item,
+      subject: title,
+      html: body,     
+    });
+
+    await transporter.sendMail({
+      from: 'campaigns@shecodeshacks.com',
+      to: item,
+      subject: title,
+      html: body,
+      headers: {
+        'Return-Path': 'bounced@shecodeshacks.com', // Set the Return-Path header
+        'X-Campaign-id': campaign_id // Set the X-Campaign-id header
+      },
+      replyTo:"channels@shecodeshacks.com"
+    });
+
+    console.log(`Mail sent to ${item}`);
+    sentEmailCount++; // Increment the counter for successful email
+
+  } catch (error) {
+    console.error(`Failed to send email to ${item}:`, error);
+    throw new Error(`Failed to send emails for campaign ${campaign_id}`);
+  }
+
 }, { connection: redisConnection });
 
-
-
-emailWorker.on('failed', (job, err) => {
-    // Ensure job is defined before accessing its properties
-    if (job) {
-        console.error(`Job ${job.id} failed with error ${err.message}`);
-    } else {
-        console.error(`Job failed with error ${err.message}`);
-    }
+// Event listener for when the job fails
+emailWorker.on('failed', async (job, err) => {
+  console.log("Inside failed event listener");
+  console.log(job);
+  if (job) {
+    console.error(`Job ${job.id} failed with error ${err.message}`);
+    // Update the campaign status to 'failed' on job failure
+    await prisma.emailCampaign.update({
+      where: { id: job.name },
+      data: { status: CampaignStatus.failed },
+    });
+  } else {
+    console.error(`Job failed with error ${err.message}`);
+  }
 });
 
-emailWorker.on('ready',()=>{
-    console.log("ready")
-})
+// Event listener for when the job completes successfully
+emailWorker.on('completed', async (job) => {
+  console.log("Inside completed event listener");
+  console.log(job);
+  console.log("Total emails sent: ", sentEmailCount);
+  if (job) {
+    console.log(`Job ${job.id} completed successfully.`);
+    // Update the campaign status to 'completed' and update the targeted email count
+    await prisma.emailCampaign.update({
+      where: { id: job.name },
+      data: {
+        status: CampaignStatus.completed, // Set the status to 'completed'
+        targeted: sentEmailCount, // Set the count of successfully sent emails
+      },
+    });
+    console.log(`Email processing completed successfully. Total emails sent: ${sentEmailCount}`);
+  }
+});
 
+// Event listener for when the worker is ready
+emailWorker.on('ready', () => {
+  console.log("Email worker ready");
+});
 
 console.log('Email worker started');

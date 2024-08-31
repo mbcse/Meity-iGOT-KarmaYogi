@@ -1,37 +1,52 @@
 import express, { Request, Response } from 'express';
 import { addEmailToQueue, addSMSToQueue, addWhatsappToQueue, addEmailToQueue_NonCampaign } from '../utils/producers';
 import axios from 'axios';
-
+import { CampaignStatus, PrismaClient } from '@prisma/client';
 const producerRouter = express.Router();
+const prisma = new PrismaClient();
 
-export async function handleQueueRequest(req: Request, res: Response, addToQueue: Function, successMessage: string, typeOfList: string) {
+
+export async function handleQueueRequest(
+    req: Request, 
+    res: Response, 
+    addToQueue: Function, 
+    successMessage: string, 
+    typeOfList: string
+) {
     try {
+        console.log("In handleQueueRequest\n");
         const payload = req.body;
         console.log(payload);
 
         const bucket = payload.bucket;
-        console.log("bucket :  ", bucket);
+        console.log("\nbucket for pulling data:  ", bucket);
+        
         const response = await axios.post(`http://localhost:3000/api/db/showview/get${typeOfList}`, { bucketName: bucket });
-        console.log("response", response.data);
+        console.log("\nresponse", response.data);
 
         let camptype = typeOfList.slice(0, -4);
-
         if (camptype === "whatsapp" || camptype === "sms") {
             camptype = "number";
         }
+        console.log("\ncamptype", camptype);
 
         const listarr = response.data.map((element: any) => element[camptype]);
+        console.log("\nlistarr", listarr);
 
         const queue_payload = {
             [`${camptype}List`]: listarr,
             "work_type": payload.work_type,
-            "sub_campaign_id": payload.sub_campaign_id
+            "sub_campaign_id": payload.sub_campaign_id,
+            "template": payload.template,
+            "scheduledAt": payload.validDate,  // Ensure the scheduledAt date is parsed correctly
         };
 
-        console.log("queue_payload", queue_payload);
+        console.log("\nqueue_payload", queue_payload);
 
-        await addToQueue(queue_payload);
+        const addedToQueue = await addToQueue(queue_payload);
 
+
+        console.log("added to queue : " ,addedToQueue);
         // Ensure the response is sent in JSON format
         return JSON.stringify({ message: successMessage });
     } catch (error) {
@@ -39,7 +54,6 @@ export async function handleQueueRequest(req: Request, res: Response, addToQueue
         return error;
     }
 }
-
 
 producerRouter.get('/health', (req, res) => {
     res.json('healthy');

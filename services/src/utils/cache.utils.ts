@@ -17,6 +17,7 @@ export async function getEmailCache(cacheKey: string): Promise<IRedisEmailValues
     }    
   });
 
+  console.log("Cache Client : ",client);
   await client.connect();
 
   client.on("connect", () => {
@@ -32,6 +33,8 @@ export async function getEmailCache(cacheKey: string): Promise<IRedisEmailValues
       title: resultTitle,
       body: resultBody,
     };
+    
+    console.log("Cache Result : ",result);
 
     if (result.body && result.title) {
       return result;
@@ -55,6 +58,10 @@ export async function setEmailCache(campaign_id: string, value: IRedisEmailValue
       port: 4003
     }    
   });
+  console.log("Cache set Client : ",client);
+
+  console.log("Cache set Value: ",value);
+
 
   await client.connect();
 
