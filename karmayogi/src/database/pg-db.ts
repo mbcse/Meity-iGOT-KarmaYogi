@@ -7,5 +7,6 @@ import { Pool } from "pg";
     host: process.env.PGSQL_HOST,
     port: parseInt(process.env.PGSQL_PORT as string),
     database: process.env.PGSQL_DATABASE,
+    ssl: process.env.PGSQL_SSLMODE === "true" ? { rejectUnauthorized: false } : false,
     log: console.log,
   });
