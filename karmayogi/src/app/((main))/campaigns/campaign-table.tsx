@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CampCardType } from "./columns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -26,7 +27,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData extends { id: number; timeCreate: string }, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<CampCardType, unknown>) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "timeCreate", desc: true },
   ]);
@@ -44,7 +45,7 @@ export function DataTable<TData extends { id: number; timeCreate: string }, TVal
 
   const router = useRouter();
 
-  const handleRowClick = (id: number) => {
+  const handleRowClick = (id: string) => {
     router.push(`/campaigns/${id}`);
   };
 
