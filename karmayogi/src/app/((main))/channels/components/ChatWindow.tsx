@@ -46,7 +46,7 @@ export default function ChatWindow() {
       const fetchThreadMessages = async (threadId: string) => {
         console.log("Fetching messages for thread:", threadId);
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_URL}/chat/thread/${emailId}/${threadId}`);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/chat/thread/${emailId}/${threadId}`);
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
@@ -97,7 +97,7 @@ export default function ChatWindow() {
       setInputValue('');
     
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_URL}/chat/reply`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/chat/reply`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

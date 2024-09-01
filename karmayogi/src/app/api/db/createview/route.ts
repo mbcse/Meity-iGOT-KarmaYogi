@@ -6,7 +6,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const { viewName, sqlQuery } = await req.json(); // Specify the name of the view
         console.log(viewName, sqlQuery);
        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/buckets/create`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/buckets/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

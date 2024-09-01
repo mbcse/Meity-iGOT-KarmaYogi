@@ -24,7 +24,7 @@ export interface ReportTableProps {
 
 async function fetchCampaigns() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/campaigns`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns`, {
       next: { revalidate: 60 }, // Optional: Revalidate data every 60 seconds
     });
     if (!response.ok) {

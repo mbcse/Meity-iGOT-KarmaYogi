@@ -73,7 +73,7 @@ export default function SubCampaignForm({
       }
   
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/campaigns/${campaignId}/create/${campaignType}camp`,
+        `${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns/${campaignId}/create/${campaignType}camp`,
         {
           method: "POST",
           headers: {
