@@ -58,9 +58,7 @@ export async function asyncGetDocument(template: string) {
     const encodedString = template.replace('#template/', '');
     console.log('#template/',encodedString);
     try {
-      const link = `${import.meta.env.VITE_BACKEND_HOST}/templates/download/nocode/${encodedString}.json`;
-      console.log(link);
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_HOST}/templates/download/nocode/${encodedString}.json`);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_HOST}/templates/download/nocode/${encodedString}/true`);
       const jsonData =  await response.json();
       console.log(jsonData);
       return jsonData;
