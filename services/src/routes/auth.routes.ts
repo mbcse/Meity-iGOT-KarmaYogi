@@ -8,13 +8,14 @@ const authRouter = express.Router();
 const prisma = new PrismaClient();
 
 import 'dotenv/config';
+import { cookieDomain, jwtSecret } from '../config';
 
 export const COOKIE_OPTIONS = {
     httpOnly: true, // Ensures the cookie is sent only over HTTP(S), not client JavaScript
     secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only used over HTTPS
     sameSite: 'lax' as const, // Helps mitigate CSRF attacks, 'lax' is generally more compatible with third-party apps
     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
-    domain: process.env.COOKIE_DOMAIN || 'localhost', // Set your domain here
+    domain: cookieDomain || 'localhost', // Set your domain here
 };
 
 // Middleware to parse cookies
@@ -41,7 +42,7 @@ authRouter.post('/signin', async (req: Request, res: Response) => {
 
         const token = jwt.sign(
             { id: user.id, email: user.email },
-            process.env.JWT_SECRET as string,
+            jwtSecret as string,
             { expiresIn: '2d' }
         );
 
@@ -66,7 +67,7 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
 
         const token = jwt.sign(
             { id: user.id, email: user.email },
-            process.env.JWT_SECRET as string,
+            jwtSecret as string,
             { expiresIn: '2d' }
         );
 

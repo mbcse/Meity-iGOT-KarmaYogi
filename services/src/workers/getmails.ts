@@ -6,7 +6,7 @@ import {
     imapURI,
     emailWorkerEmail,
     emailWorkerPassword,
-} from './config';
+} from '../config';
 
 const prisma = new PrismaClient();
 

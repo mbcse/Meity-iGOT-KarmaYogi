@@ -10,18 +10,22 @@ import statsRouter from "./routes/stats.routes";
 import campaignRouter from "./routes/campaign.routes";
 import templateRouter from "./routes/templates.routes";
 import scheduleRouter from "./routes/schedule.routes";
+import { allowedOrigins, port } from "./config";
+
 const app = express();
 
 app.use(express.json());
 
-// Get allowed origins from .env file
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:3000", "http://localhost:3001","http://localhost:5173"]; 
-
 const corsOptions = {
   origin: function (origin: any, callback: any) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    if (!allowedOrigins || allowedOrigins.length === 0) {
+      // If no allowed origins are specified, allow all origins
+      callback(null, true);
+    } else if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      // If the origin is in the allowedOrigins array or no origin is provided
       callback(null, true);
     } else {
+      // If the origin is not allowed
       callback(new Error("Not allowed by CORS"));
     }
   },
@@ -40,13 +44,10 @@ app.use("/pixels", pixelRouter);
 app.use("/stats", statsRouter);
 app.use("/campaigns", campaignRouter);
 app.use("/templates", templateRouter);
-// app.use("/schedule", scheduleRouter);
 
 app.get("/health", (req, res) => {
   res.json("healthy");
 });
-
-const port = process.env.PORT || 3333;
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

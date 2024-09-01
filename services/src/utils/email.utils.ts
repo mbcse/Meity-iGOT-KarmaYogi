@@ -1,3 +1,4 @@
+import { s3Bucket } from "../config";
 import { getEmailCache, setEmailCache } from "./cache.utils";
 import { downloadFile } from "./s3.utils"; // Assuming your S3 utility functions are in a file named "s3.utils"
 
@@ -8,7 +9,7 @@ export async function getEmailInfo(campaign_id: string,template:string) {
         console.log("Cached Data : ",cachedData);
         if (cachedData == null) {
             // Define your S3 bucket name and file name
-            const bucketName = process.env.AWS_BUCKET as string; // Replace with your actual bucket name
+            const bucketName = s3Bucket; // Replace with your actual bucket name
             const fileName = `${template}.html`; // Assuming the file is stored as JSON with the campaign ID as the filename
             console.log("\nBucket Name : ",bucketName);
             console.log("\nFile Name : ",fileName);

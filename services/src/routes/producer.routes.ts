@@ -6,6 +6,7 @@ const producerRouter = express.Router();
 const prisma = new PrismaClient();
 
 import 'dotenv/config';
+import { DB_API_BASE_URL } from '../config';
 
 export async function handleQueueRequest(
     req: Request, 
@@ -22,7 +23,7 @@ export async function handleQueueRequest(
         const bucket = payload.bucket;
         console.log("\nbucket for pulling data:  ", bucket);
         
-        const response = await axios.post(`${process.env.DB_API_BASE_URL}/get${typeOfList}`, { bucketName: bucket });
+        const response = await axios.post(`${DB_API_BASE_URL}/get${typeOfList}`, { bucketName: bucket });
         console.log("\nresponse", response.data);
 
         let camptype = typeOfList.slice(0, -4);
