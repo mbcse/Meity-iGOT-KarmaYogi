@@ -1,6 +1,8 @@
 import { conn } from '@/database/pg-db';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
         const searchParams = req.nextUrl.searchParams;
