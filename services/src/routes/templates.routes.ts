@@ -4,6 +4,7 @@ import cors from 'cors';
 import { uploadFile,downloadFile } from '../utils/s3.utils';
 import 'dotenv/config';
 import fs from 'fs';
+import { s3Bucket } from '../config';
 
 const prisma = new PrismaClient();
 const templateRouter = express.Router();
@@ -86,14 +87,14 @@ templateRouter.post('/upload/nocode'
     const result_json = await uploadFile(
       Buffer.from(plainJSON),
       templateName_final_json,
-      process.env.AWS_BUCKET as string,
+      s3Bucket as string,
       true
     );
 
     const result_html = await uploadFile(
       Buffer.from(code),
       templateName_final_html,
-      process.env.AWS_BUCKET as string,
+      s3Bucket as string,
       false
     );
 
@@ -130,14 +131,14 @@ templateRouter.put('/update/nocode', async (req: Request, res: Response) => {
     const result_json = await uploadFile(
       Buffer.from(plainJSON),
       templateName_final_json,
-      process.env.AWS_BUCKET as string,
+      s3Bucket as string,
       true
     );
 
     const result_html = await uploadFile(
       Buffer.from(code),
       templateName_final_html,
-      process.env.AWS_BUCKET as string,
+      s3Bucket as string,
       false
     );
 
@@ -160,7 +161,7 @@ templateRouter.get('/download/nocode/:templateName/:isJSON', async (req: Request
     const isJSONConverted = isJSON === 'true';
     
     // Assuming `downloadFile` returns an object or JSON that can be sent directly
-    const template = await downloadFile(process.env.AWS_BUCKET as string, templateName, isJSONConverted);
+    const template = await downloadFile(s3Bucket as string, templateName, isJSONConverted);
 
     if (template) {
       return res.json(template);

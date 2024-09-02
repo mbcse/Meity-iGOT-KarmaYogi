@@ -4,7 +4,7 @@ import { AggFields } from '../utils/AggFields';
 import { SubCampaignTable } from '@/components/atoms/Reports/SubCampaignTable';
 
 export default async function Page({ params }: { params: { campaignid: string } }) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/stats/campaign/${params.campaignid}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/stats/campaign/${params.campaignid}`, {
         cache: 'no-store', // Ensures fresh data on every request
     });
 

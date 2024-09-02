@@ -9,10 +9,14 @@ import {
   smtpPort,
   emailWorkerEmail,
   emailWorkerPassword,
-} from './config'; // Import the variables from the config file
+  redisHost,
+  redisPort,
+  orcptEmail,
+  emailQueueName,
+  replyToEmail
+} from '../config'; // Import the variables from the config file
 
 const prisma = new PrismaClient();
-const redisConnection = { host: 'localhost', port: 4003 };
 
 const transporterOptions: SMTPTransport.Options = {
   host: smtpHostUri,
@@ -24,7 +28,7 @@ const transporterOptions: SMTPTransport.Options = {
   },
   dsn: {
     notify: ['FAILURE', 'DELAY'],
-    orcpt: 'bounced@shecodehacks.com'
+    orcpt: orcptEmail as string
   },
 };
 
@@ -32,11 +36,11 @@ console.log("Transporter Options: ", transporterOptions);
 
 let sentEmailCount = 0; // Counter for successful emails
 
-const emailWorker = new Worker('email-qu', async (job) => {
+const emailWorker = new Worker(emailQueueName, async (job) => {
   console.log("In email worker");
   console.log(job);
 
-  const { item, template }: { item: string; template: string } = job.data;
+  const { item, template, sender }: { item: string; template: string; sender:string } = job.data;
   const campaign_id = job.name;
 
   // Update campaign status to "running"
@@ -50,22 +54,22 @@ const emailWorker = new Worker('email-qu', async (job) => {
 
   try {
     console.log({
-      from: 'info@shecodeshacks.com',
+      from: sender,
       to: item,
       subject: title,
       html: body,     
     });
 
     await transporter.sendMail({
-      from: 'campaigns@shecodeshacks.com',
+      from: sender,
       to: item,
       subject: title,
       html: body,
       headers: {
-        'Return-Path': 'bounced@shecodeshacks.com', // Set the Return-Path header
+        'Return-Path': orcptEmail, // Set the Return-Path header
         'X-Campaign-id': campaign_id // Set the X-Campaign-id header
       },
-      replyTo:"channels@shecodeshacks.com"
+      replyTo: replyToEmail
     });
 
     console.log(`Mail sent to ${item}`);
@@ -76,7 +80,10 @@ const emailWorker = new Worker('email-qu', async (job) => {
     throw new Error(`Failed to send emails for campaign ${campaign_id}`);
   }
 
-}, { connection: redisConnection });
+}, { connection: {
+  host: redisHost,
+  port: parseInt(redisPort as string)
+}});
 
 // Event listener for when the job fails
 emailWorker.on('failed', async (job, err) => {

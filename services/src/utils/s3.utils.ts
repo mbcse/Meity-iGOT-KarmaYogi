@@ -1,6 +1,6 @@
 import { PutObjectCommand, GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import { AWSAccessKey, AWSSecretKey, s3Region } from '../workers/config'; // Import config
+import { AWSAccessKey, AWSSecretKey, s3Region } from '../config'; // Import config
 
 // Initialize the S3 client using config values
 const s3Client = new S3Client({

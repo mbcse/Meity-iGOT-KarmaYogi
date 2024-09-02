@@ -41,7 +41,7 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/campaigns/${params.campaignid}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns/${params.campaignid}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         console.log('Fetched campCardParentData:', data);
