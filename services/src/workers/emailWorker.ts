@@ -40,7 +40,7 @@ const emailWorker = new Worker(emailQueueName, async (job) => {
   console.log("In email worker");
   console.log(job);
 
-  const { item, template, fromEmail }: { item: string; template: string; fromEmail:string } = job.data;
+  const { item, template, sender }: { item: string; template: string; sender:string } = job.data;
   const campaign_id = job.name;
 
   // Update campaign status to "running"
@@ -54,14 +54,14 @@ const emailWorker = new Worker(emailQueueName, async (job) => {
 
   try {
     console.log({
-      from: fromEmail,
+      from: sender,
       to: item,
       subject: title,
       html: body,     
     });
 
     await transporter.sendMail({
-      from: fromEmail,
+      from: sender,
       to: item,
       subject: title,
       html: body,

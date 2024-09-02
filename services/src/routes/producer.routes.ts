@@ -41,6 +41,7 @@ export async function handleQueueRequest(
             "sub_campaign_id": payload.sub_campaign_id,
             "template": payload.template,
             "scheduledAt": payload.validDate,  // Ensure the scheduledAt date is parsed correctly
+            "senderEmail": payload.email
         };
 
         console.log("\nqueue_payload", queue_payload);

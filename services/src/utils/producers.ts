@@ -23,6 +23,7 @@ export interface I_EmailQueue {
     sub_campaign_id: string;
     template: string;
     scheduledAt: Date; // Add scheduled date and time
+    senderEmail:string;
 }
 
 export interface I_EmailQueue_NC {
@@ -37,6 +38,7 @@ export interface I_SMSQueue {
     sub_campaign_id: string;
     template: string;
     scheduledAt: Date; // Add scheduled date and time
+    sender:string;
 }
 
 export interface I_WhatsappQueue {
@@ -44,13 +46,15 @@ export interface I_WhatsappQueue {
     sub_campaign_id: string;
     template: string;
     scheduledAt: Date; // Add scheduled date and time
+    sender:string;
 }
 async function addItemsToQueue(
     queue: Queue,
     items: any[],
     sub_campaign_id: string,
     template: string,
-    scheduledAt: Date
+    scheduledAt: Date,
+    sender:string
 ) {
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
 
@@ -85,13 +89,12 @@ async function addItemsToQueue(
                 item,
                 template,
                 scheduledAt: scheduledDateIST.toISOString(), // Keep this in ISO format
+                sender
             };
             const result = await queue.add(sub_campaign_id, jobData, { delay:delayUTC });
             results.push(result);
         } catch (error) {
             console.error(`Failed to add item ${JSON.stringify(item)} to queue:`, error);
-            // Decide if you want to continue or break here
-            // throw error; // Uncomment if you want to stop processing on the first failure
         }
     }
 
@@ -101,16 +104,16 @@ async function addItemsToQueue(
 
 
 
-export async function addEmailToQueue({ emailList, sub_campaign_id, template, scheduledAt }: I_EmailQueue) {
-    return await addItemsToQueue(EmailQueue, emailList, sub_campaign_id, template, scheduledAt);
+export async function addEmailToQueue({ emailList, sub_campaign_id, template, scheduledAt,senderEmail }: I_EmailQueue) {
+    return await addItemsToQueue(EmailQueue, emailList, sub_campaign_id, template, scheduledAt,senderEmail);
 }
 
-export async function addSMSToQueue({ numberList, sub_campaign_id, template, scheduledAt }: I_SMSQueue) {
-    return await addItemsToQueue(SMSQueue, numberList, sub_campaign_id, template, scheduledAt);
+export async function addSMSToQueue({ numberList, sub_campaign_id, template, scheduledAt,sender }: I_SMSQueue) {
+    return await addItemsToQueue(SMSQueue, numberList, sub_campaign_id, template, scheduledAt,sender);
 }
 
-export async function addWhatsappToQueue({ numberList, sub_campaign_id, template, scheduledAt }: I_WhatsappQueue) {
-    return await addItemsToQueue(WhatsappQueue, numberList, sub_campaign_id, template, scheduledAt);
+export async function addWhatsappToQueue({ numberList, sub_campaign_id, template, scheduledAt,sender }: I_WhatsappQueue) {
+    return await addItemsToQueue(WhatsappQueue, numberList, sub_campaign_id, template, scheduledAt,sender);
 }
 
 async function addItemsToQueue_NonCampaign(queue: Queue, item: any, work_type: string, scheduledAt: Date) {
