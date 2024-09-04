@@ -3,25 +3,29 @@ import mongoose from 'mongoose';
 import winston from 'winston';
 import connectDB from './config/database';
 import cors from 'cors';
-
 import { setupRouter } from './routes/setup.routes';
 import { chatRouter } from './routes/chat.routes';
+import { allowedOrigins,port } from './config';
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:3000']; // Add your React and Next.js app URLs here
 
 const corsOptions = {
   origin: function (origin: any, callback: any) {
-    console.log('Request origin:', origin);
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    if (!allowedOrigins || allowedOrigins.length === 0) {
+      // If no allowed origins are specified, allow all origins
+      callback(null, true);
+    } else if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      // If the origin is in the allowedOrigins array or no origin is provided
       callback(null, true);
     } else {
-      console.error('Blocked by CORS:', origin); // Added debugging
-      callback(new Error('Not allowed by CORS'));
+      // If the origin is not allowed
+      callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true, // If you need to send cookies or authorization headers
 };
+
 
 // Use CORS middleware
 app.use(cors(corsOptions));
@@ -54,7 +58,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send({ error: err.message }); // Sends a 500 Internal Server Error response with the error message
 });
 
-const port = process.env.PORT || 7000;
 app.listen(port, () => {
   logger.info(`Server running on port ${port}`);
 });
