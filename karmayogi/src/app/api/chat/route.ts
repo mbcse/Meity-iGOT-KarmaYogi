@@ -84,6 +84,6 @@ const prompt = `Convert {userinput} to a SINGLE LINE raw SQL query, no comments,
         const tableDataJson = await tableData.json();
         return NextResponse.json({tableData:tableDataJson,sqlQuery:data.sqlQuery});
     } catch (error) {
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: error }, { status: 500 });
     }
 }

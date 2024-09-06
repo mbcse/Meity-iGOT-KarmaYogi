@@ -13,7 +13,9 @@ import {
   redisPort,
   orcptEmail,
   emailQueueName,
-  replyToEmail
+  replyToEmail,
+  redisUsername,
+  redisPassword
 } from '../config'; // Import the variables from the config file
 
 const prisma = new PrismaClient();
@@ -82,7 +84,9 @@ const emailWorker = new Worker(emailQueueName, async (job) => {
 
 }, { connection: {
   host: redisHost,
-  port: parseInt(redisPort as string)
+  port: parseInt(redisPort as string),
+  username:redisUsername,
+  password: redisPassword
 }});
 
 // Event listener for when the job fails
