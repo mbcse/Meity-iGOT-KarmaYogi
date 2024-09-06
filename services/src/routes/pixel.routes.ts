@@ -16,14 +16,24 @@ pixelRouter.get("/email/:id", async (req: Request, res: Response) => {
       'Expires': '0'
     });
 
-    // Check if the deviceType was passed as a query parameter
-    let deviceType = req.query.deviceType?.toString();
+    console.log(req);
+    // Get symbols from the request object
+    const symbols = Object.getOwnPropertySymbols(req);
 
-    // Fallback to checking the User-Agent header
-    if (!deviceType) {
-      const userAgent = req.get('User-Agent');
-      const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent as string);
-      deviceType = isMobile ? 'mobile' : 'desktop';
+    // Find the symbol that represents 'kHeaders'
+    const kHeadersSymbol = symbols.find(symbol => symbol.toString() === 'Symbol(kHeaders)');
+
+    let deviceType = 'desktop'; // default to desktop
+
+    if (kHeadersSymbol) {
+      // Access the headers using the symbol
+      const kHeaders = req[kHeadersSymbol];
+
+      // Check for the 'sec-ch-ua-mobile' header
+      if (kHeaders && kHeaders['sec-ch-ua-mobile']) {
+        const isMobile = kHeaders['sec-ch-ua-mobile'] === '?1'; // mobile if '?1', otherwise desktop
+        deviceType = isMobile ? 'mobile' : 'desktop';
+      }
     }
 
     // Increment counters based on the detected device type
