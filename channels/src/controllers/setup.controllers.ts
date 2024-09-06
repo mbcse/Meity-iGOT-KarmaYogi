@@ -22,12 +22,13 @@ export const setupAccountController = async (req: Request, res: Response) => {
 
 export const getAllAccountsController = async (req: Request, res: Response) => {
   try {
-    const accounts = await EmailAccount.find();
+    const accounts = await EmailAccount.find().select('-password'); // Exclude the password field
     res.status(200).json(accounts);
   } catch (error) {
     res.status(500).json({ error: error });
   }
-}
+};
+
 
 export const fetchInitController = async (req: Request, res: Response) => {
   const { email } = req.body;
