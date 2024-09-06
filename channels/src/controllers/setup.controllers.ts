@@ -9,14 +9,25 @@ import { generateThreadId } from '../models/Email';
 export const setupAccountController = async (req: Request, res: Response) => {
   try {
     const accountData: IEmailAccount = req.body;
+    console.log(accountData);
     const newAccount = new EmailAccount(accountData);
-    await newAccount.save();
+    console.log(newAccount);
+    const respo = await newAccount.save();
+    console.log(respo);
     res.status(201).json({ message: 'Email account setup successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to setup email account' });
+    res.status(500).json({ error: error });
   }
 };
 
+export const getAllAccountsController = async (req: Request, res: Response) => {
+  try {
+    const accounts = await EmailAccount.find();
+    res.status(200).json(accounts);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+}
 
 export const fetchInitController = async (req: Request, res: Response) => {
   const { email } = req.body;
