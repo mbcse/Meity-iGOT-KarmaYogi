@@ -39,13 +39,9 @@ console.log("Transporter Options: ", transporterOptions);
 let sentEmailCount = 0; // Counter for successful emails
 
 const emailWorker = new Worker(emailQueueName, async (job) => {
-  console.log("In email worker");
-  console.log(job);
-
   const { item, template, sender }: { item: string; template: string; sender:string } = job.data;
   const campaign_id = job.name;
 
-  // Update campaign status to "running"
   await prisma.emailCampaign.update({
     where: { id: campaign_id },
     data: { status: CampaignStatus.running },
@@ -54,28 +50,27 @@ const emailWorker = new Worker(emailQueueName, async (job) => {
   const { body, title } = await getEmailInfo(campaign_id, template) as IRedisEmailValues;
   const transporter = nodemailer.createTransport(transporterOptions);
 
-  try {
-    console.log({
-      from: sender,
-      to: item,
-      subject: title,
-      html: body,     
-    });
+  // Generate pixel tracking URL
+  const trackingPixelUrl = `https://services.shivamja.in/pixels/email/${campaign_id}`;
+  const pixelImageTag = `<img src="${trackingPixelUrl}" alt="" width="1" height="1" style="display:none;">`;
 
+  // Inject the pixel before the closing body tag
+  const emailBodyWithPixel = body.replace('</div></body></html>', `${pixelImageTag}</div></body></html>`);
+
+  try {
     await transporter.sendMail({
       from: sender,
       to: item,
       subject: title,
-      html: body,
+      html: emailBodyWithPixel,  // Use the body with the tracking pixel
       headers: {
-        'Return-Path': orcptEmail, // Set the Return-Path header
-        'X-Campaign-id': campaign_id // Set the X-Campaign-id header
+        'Return-Path': orcptEmail,
+        'X-Campaign-id': campaign_id
       },
       replyTo: replyToEmail
     });
 
-    console.log(`Mail sent to ${item}`);
-    sentEmailCount++; // Increment the counter for successful email
+    sentEmailCount++;
 
   } catch (error) {
     console.error(`Failed to send email to ${item}:`, error);
