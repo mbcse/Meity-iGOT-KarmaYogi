@@ -1,7 +1,7 @@
 import { Queue } from 'bullmq';
-import { emailQueueName, redisHost, redisPort } from '../config';
+import { emailQueueName, redisHost, redisPassword, redisPort, redisUsername } from '../config';
 
-const redisConnection = { host: redisHost, port: parseInt(redisPort) };
+const redisConnection = { host: redisHost, port: parseInt(redisPort) , password:redisPassword, username:redisUsername };
 const EmailQueue = new Queue(emailQueueName, { connection: redisConnection });
 const SMSQueue = new Queue('sms-qu', { connection: redisConnection });
 const WhatsappQueue = new Queue('whatsapp-qu', { connection: redisConnection });
