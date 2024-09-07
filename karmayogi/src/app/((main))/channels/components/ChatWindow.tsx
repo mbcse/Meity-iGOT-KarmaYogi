@@ -41,8 +41,8 @@ export default function ChatWindow() {
     const emailId = "info@shecodeshacks.com"; // Replace with actual logged-in user's email
 
     useEffect(() => {
-      if (!selectedChat?.thread) return;
-
+      if (!selectedChat?.thread) return setMessages([]); // Reset messages if no thread selected
+      
       const fetchThreadMessages = async (threadId: string) => {
         console.log("Fetching messages for thread:", threadId);
         try {
@@ -64,7 +64,7 @@ export default function ChatWindow() {
       };
 
       fetchThreadMessages(selectedChat.thread);
-    }, [selectedChat?.thread]);
+    }, [selectedChat]);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();

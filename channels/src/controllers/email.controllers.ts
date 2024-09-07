@@ -99,17 +99,7 @@ export const getMessagesListController = async (req: Request, res: Response) => 
   console.log(emailID);
   
   try {
-    const messages = await Email.aggregate([
-      {
-        $match: {
-          'to.address': emailID.toLowerCase(),
-          inReplyTo: ""
-        }
-      },
-      {
-        $sort: { date: 1 }
-      }
-    ]);
+    const messages = await Email.find({})
 
     console.log(messages);
     res.status(200).json(messages);
