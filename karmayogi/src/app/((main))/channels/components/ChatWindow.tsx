@@ -3,7 +3,7 @@ import React, { FormEvent, useState, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { selectedChatAtom } from '@/states/chat.atom';
 import ChatTopbar from './ChatTopbar';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button';
 import { ChevronUp } from 'lucide-react';

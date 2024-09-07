@@ -11,11 +11,11 @@ import {
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/components/hooks/use-toast";
 
 export interface IAccount {
   _id: string;
   email: string;
-  password: string;
   smtpPort: string | number;
   smtpURI: string;
   imapPort: string | number;
@@ -32,28 +32,43 @@ export default function SettingsPage() {
   const [smtpURI, setSmtpURI] = useState("");
   const [smtpPort, setSmtpPort] = useState("");
   const [connectedAccounts, setConnectedAccounts] = useState<IAccount[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchConnectedAccounts = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/setup/accounts`);
-
-        if (response.ok) {
-          const data = await response.json();
-          setConnectedAccounts(data);
-        } else {
-          alert("Failed to fetch connected accounts");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred. Please try again.");
-      }
-    };
-
     fetchConnectedAccounts();
   }, []);
 
+  const fetchConnectedAccounts = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/setup/accounts`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setConnectedAccounts(data);
+      } else {
+        setError("Failed to fetch connected accounts");
+        toast({
+          title: "Error",
+          description: "Failed to fetch connected accounts",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("An error occurred while fetching accounts. Please try again.");
+      toast({
+        title: "Error",
+        description: "An error occurred while fetching accounts",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSave = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/setup/account`, {
         method: "POST",
@@ -70,20 +85,45 @@ export default function SettingsPage() {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        alert("Email account setup successfully");
+        toast({
+          title: "Success",
+          description: "Email account setup successfully",
+        });
+        fetchConnectedAccounts(); // Refresh the list of connected accounts
+        // Reset form fields
+        setEmail("");
+        setPassword("");
+        setImapURI("");
+        setImapPort("");
+        setSmtpURI("");
+        setSmtpPort("");
       } else {
-        alert("Failed to setup email account");
+        setError(data.error || "Failed to setup email account");
+        toast({
+          title: "Error",
+          description: data.error || "Failed to setup email account",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+      setError("An unexpected error occurred. Please try again.");
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div id="emails">
-      <Card x-chunk="dashboard-04-chunk-4">
+      <Card>
         <CardHeader>
           <CardTitle>Email Account Setup</CardTitle>
           <CardDescription>
@@ -134,7 +174,9 @@ export default function SettingsPage() {
           </form>
         </CardContent>
         <CardFooter className="border-t px-6 py-4">
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </Button>
         </CardFooter>
       </Card>
 

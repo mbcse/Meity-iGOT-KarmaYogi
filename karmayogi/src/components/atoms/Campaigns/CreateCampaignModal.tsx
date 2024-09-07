@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { campaignsAtom, isCreateModalOpenAtom } from '@/states/campcard.atom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
