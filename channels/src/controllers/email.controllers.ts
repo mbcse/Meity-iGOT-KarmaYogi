@@ -30,6 +30,7 @@ export const syncEmailController = async (req: Request, res: Response) => {
       const highestSeqEmail = await Email.findOne({}).sort('-seq').exec();
       const highestSeq = highestSeqEmail ? highestSeqEmail.seq : 0;
 
+      console.log('Highest Seq:', highestSeq);
       const messages = client.fetch(
         { seq: `${highestSeq + 1}:*` },
         { source: true }
@@ -140,5 +141,101 @@ export const getMessagesInThreadController = async (req: Request, res: Response)
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch messages in thread' });
+  }
+};
+
+
+export const syncEmailControllerByDate = async (req: Request, res: Response) => {
+  const { emailID } = req.params;
+
+  try {
+    const account = await EmailAccount.findOne({ email: emailID });
+    if (!account) {
+      return res.status(404).json({ error: 'Email account not found' });
+    }
+
+    const client = new ImapFlow({
+      host: account.imapURI,
+      port: parseInt(account.imapPort as string),
+      secure: true,
+      auth: {
+        user: account.email,
+        pass: account.password,
+      },
+    });
+
+    await client.connect();
+    let lock = await client.getMailboxLock('INBOX');
+    try {
+      const lastSyncDate = account.lastSyncedAt || new Date(0); // Use Unix epoch if never synced
+      const messages = client.fetch(
+        { since: lastSyncDate },
+        { source: true, uid: true }
+      );
+
+      const emailsToInsert = []; // Array to hold new emails
+
+      for await (let message of messages) {
+        const parsed = await simpleParser(message.source);
+
+        const extractAddresses = (addresses: AddressObject | AddressObject[] | undefined): EmailAddress[] => {
+          if (!addresses) return [];
+          if (Array.isArray(addresses)) {
+            return addresses.flatMap(address => address.value);
+          }
+          return addresses.value;
+        };
+
+        const newEmail = {
+          from: parsed.from?.value[0] ? {
+            address: parsed.from.value[0].address,
+            name: parsed.from.value[0].name
+          } : { address: '', name: '' },
+          to: extractAddresses(parsed.to).map(to => ({
+            address: to.address,
+            name: to.name,
+          })),
+          cc: extractAddresses(parsed.cc).map(cc => ({
+            address: cc.address,
+            name: cc.name,
+          })),
+          bcc: extractAddresses(parsed.bcc).map(bcc => ({
+            address: bcc.address,
+            name: bcc.name,
+          })),
+          subject: parsed.subject || '',
+          htmlBody: parsed.html || parsed.textAsHtml || '',
+          textBody: parsed.text || '',
+          messageID: parsed.messageId || '',
+          references: parsed.references || [],
+          inReplyTo: parsed.inReplyTo || '',
+          uid: message.uid,
+          date: parsed.date || new Date(),
+        };
+
+        emailsToInsert.push(newEmail);
+
+        // Update lastSeenUID if it's higher than the current one
+        if (!account.lastSeenUID || message.uid > account.lastSeenUID) {
+          account.lastSeenUID = message.uid;
+        }
+      }
+
+      // Perform bulk insert of all emails
+      if (emailsToInsert.length > 0) {
+        await Email.insertMany(emailsToInsert);
+      }
+    } finally {
+      lock.release();
+    }
+
+    await client.logout();
+    account.lastSyncedAt = new Date();
+    await account.save();
+
+    res.status(200).json({ message: 'Emails synced successfully' });
+  } catch (error) {
+    console.error('Error syncing emails:', error);
+    res.status(500).json({ error: 'Failed to sync emails' });
   }
 };

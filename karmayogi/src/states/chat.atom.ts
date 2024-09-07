@@ -20,3 +20,4 @@ export interface SelectedChatAtomProps {
 export const chatCommTypeAtom = atom<CommType>(CommType.Mail);
 export const selectedChatAtom = atom<SelectedChatAtomProps|null>(null);
 export const ChatRenderAtom = atom<boolean|null>(true);
+export const selectedAccountAtom = atom<string>('');

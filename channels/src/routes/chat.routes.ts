@@ -3,7 +3,8 @@ import {
   getMessagesListController, 
   getThreadController, 
   getMessagesInThreadController,
-  syncEmailController 
+  syncEmailController,
+  syncEmailControllerByDate
 } from '../controllers/email.controllers';
 import { Request, Response } from 'express';
 import { EmailAccount, IEmailAccount } from '../models/EmailAccount';
@@ -76,3 +77,4 @@ chatRouter.post('/reply', async (req: Request, res: Response) => {
 
 // Route to sync emails for a specific email ID
 chatRouter.get('/syncemail/:emailID', syncEmailController);
+chatRouter.get('/syncemail/cron/:emailID', syncEmailControllerByDate);
