@@ -6,6 +6,7 @@ import cors from 'cors';
 import { setupRouter } from './routes/setup.routes';
 import { chatRouter } from './routes/chat.routes';
 import { allowedOrigins,port } from './config';
+import { accountRouter } from './routes/account.routes';
 
 const app = express();
 
@@ -47,6 +48,7 @@ connectDB();
 app.use(express.json());
 app.use('/setup', setupRouter);
 app.use('/chat', chatRouter);
+app.use('/accounts',accountRouter);
 
 app.get('/healthy', (req: Request, res: Response) => {
   res.json({ status: 'Healthy' });
