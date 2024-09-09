@@ -43,7 +43,8 @@ const emailWorker = new Worker(
   emailQueueName,
   async (job) => {
     let sentEmailCount = 0; // Counter for each job
-    const { item, template, sender }: { item: string; template: string; sender: string } = job.data;
+    const { item, template, sender, subjectLine }: { item: string; template: string; sender: string, subjectLine:string } = job.data;
+    console.log("JOB DATA : ", job.data);
     const campaign_id = job.name;
     const msgNo = 0; // Since this is the first message in the thread
 
@@ -54,7 +55,7 @@ const emailWorker = new Worker(
         data: { status: CampaignStatus.running },
       });
 
-      const { body, title } = (await getEmailInfo(campaign_id, template)) as IRedisEmailValues;
+      const { body } = (await getEmailInfo(campaign_id, template)) as IRedisEmailValues;
 
       const transporter = nodemailer.createTransport(transporterOptions);
 
@@ -68,13 +69,13 @@ const emailWorker = new Worker(
         : `${body}${pixelImageTag}`;
 
       // Generate custom Message-ID
-      const customMessageID = `<${campaign_id}.${emailNo}.${msgNo}@shecodeshacks.com>`;
+      const customMessageID = `<fresh-${campaign_id}-${emailNo}@shecodeshacks.com>`;
 
       // Send email with custom X-Thread-ID and Message-ID headers
       await transporter.sendMail({
         from: sender,
         to: item,
-        subject: title,
+        subject: subjectLine,
         html: emailBodyWithPixel,
         headers: {
           'Return-Path': orcptEmail,

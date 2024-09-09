@@ -378,6 +378,7 @@ campaignRouter.post(
           req.body.work_type = "email";
           req.body.sub_campaign_id = campaignData.id;
           req.body.validDate = validDate;
+          req.body.subjectLine = campaignName;
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             if(await handleQueueRequest(req, res, addEmailToQueue, 'Email added to queue', "emaillist")) {
               await prisma.emailCampaign.update({
