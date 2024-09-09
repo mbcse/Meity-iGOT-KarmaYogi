@@ -13,7 +13,8 @@ export interface SelectedChatAtomProps {
     messageID: string;
     date: Date;
     subject: string;
-    thread?: string;  // Add this line
+    thread?: string;  
+    inReplyTo?: string;  
 }
 
 

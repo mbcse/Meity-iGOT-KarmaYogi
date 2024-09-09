@@ -26,7 +26,6 @@ export const setupAccountController = async (req: Request, res: Response) => {
   }
 };
 
-
 async function fetchLatestEmail(accountData: IEmailAccount): Promise<{ latestSeq: number | null, emails: IEmail[] }> {
   const emailsToInsert: IEmail[] = [];
   let latestSeq: number | null = null;
@@ -54,7 +53,7 @@ async function fetchLatestEmail(accountData: IEmailAccount): Promise<{ latestSeq
         const inReplyTo = parsed.inReplyTo || '';
 
         // Skip emails that don't match the correct domain format
-        if (!/^<[\w.-]+\d+\.\d+@shecodeshacks\.com>$/.test(inReplyTo)) {
+        if (!/^<fresh-[a-zA-Z0-9]+-\d+@shecodeshacks\.com>$/.test(inReplyTo)) {
           console.log(`Skipping email with Message-ID: ${inReplyTo} (not matching the pattern)`);
           continue;
         }
@@ -72,7 +71,7 @@ async function fetchLatestEmail(accountData: IEmailAccount): Promise<{ latestSeq
           inReplyTo,
           seq: message.seq,
           date: parsed.date || new Date(),
-          threadId: generateThreadId(parsed),
+          threadId: generateThreadId(parsed.inReplyTo),
         });
 
         emailsToInsert.push(newEmail);
@@ -83,7 +82,7 @@ async function fetchLatestEmail(accountData: IEmailAccount): Promise<{ latestSeq
 
       return { latestSeq, emails: emailsToInsert };
     } finally {
-      lock.release();
+      await lock.release();
     }
   } catch (error) {
     console.log('Error fetching latest email:', error);
@@ -123,7 +122,7 @@ async function fetchRemainingEmails(accountData: IEmailAccount, startSeq: number
         const inReplyTo = parsed.inReplyTo || '';
 
         // Skip emails that don't match the correct domain format
-        if (!/^<[\w.-]+\d+\.\d+@shecodeshacks\.com>$/.test(inReplyTo)) {
+        if (!/^<fresh-[a-zA-Z0-9]+-\d+@shecodeshacks\.com>$/.test(inReplyTo)) {
           console.log(`Skipping email with Message-ID: ${inReplyTo} (not matching the pattern)`);
           continue;
         }
@@ -141,7 +140,7 @@ async function fetchRemainingEmails(accountData: IEmailAccount, startSeq: number
           inReplyTo,
           seq: message.seq,
           date: parsed.date || new Date(),
-          threadId: generateThreadId(parsed),
+          threadId: generateThreadId(parsed.inReplyTo),
         });
 
         emailsToInsert.push(newEmail);
@@ -150,7 +149,7 @@ async function fetchRemainingEmails(accountData: IEmailAccount, startSeq: number
 
       return emailsToInsert;
     } finally {
-      lock.release();
+      await lock.release();
     }
   } catch (error) {
     console.log('Error fetching remaining emails:', error);
@@ -189,6 +188,7 @@ async function syncEmails(accountData: IEmailAccount) {
 
   return { success: true, emails: emailsToInsert };
 }
+
 
 
 // Function to map a single address object

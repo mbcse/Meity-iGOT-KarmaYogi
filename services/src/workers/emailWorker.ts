@@ -43,10 +43,10 @@ const emailWorker = new Worker(
   emailQueueName,
   async (job) => {
     let sentEmailCount = 0; // Counter for each job
-    const { item, template, sender, subjectLine }: { item: string; template: string; sender: string, subjectLine:string } = job.data;
+    const { item, template, sender, subjectLine, inReplyTo }: { item: string; template: string; sender: string, subjectLine: string, inReplyTo?: string } = job.data;
     console.log("JOB DATA : ", job.data);
     const campaign_id = job.name;
-    const msgNo = 0; // Since this is the first message in the thread
+    const msgNo = 0; // Starting message number for the thread
 
     try {
       // Update the campaign status to 'running'
@@ -71,18 +71,25 @@ const emailWorker = new Worker(
       // Generate custom Message-ID
       const customMessageID = `<fresh-${campaign_id}-${emailNo}@shecodeshacks.com>`;
 
-      // Send email with custom X-Thread-ID and Message-ID headers
+      // Construct headers with optional inReplyTo
+      const headers: nodemailer.SendMailOptions['headers'] = {
+        'Return-Path': orcptEmail,
+        'X-Campaign-id': campaign_id,
+        'X-Thread-ID': `${campaign_id}-${emailNo}-${msgNo}`, // Custom header
+        'Message-ID': customMessageID, // Custom Message-ID
+      };
+
+      if (inReplyTo) {
+        headers['In-Reply-To'] = inReplyTo;
+      }
+
+      // Send email with custom headers
       await transporter.sendMail({
         from: sender,
         to: item,
         subject: subjectLine,
         html: emailBodyWithPixel,
-        headers: {
-          'Return-Path': orcptEmail,
-          'X-Campaign-id': campaign_id,
-          'X-Thread-ID': `${campaign_id}-${emailNo}-${msgNo}`, // Custom header
-          'Message-ID': customMessageID, // Custom Message-ID
-        },
+        headers,
         replyTo: replyToEmail,
       });
 

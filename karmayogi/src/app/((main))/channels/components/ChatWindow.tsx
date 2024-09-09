@@ -108,7 +108,8 @@ export default function ChatWindow() {
             subject: selectedChat?.subject, 
             replyText: inputValue, 
             messageID: selectedChat?.messageID, 
-            threadID: selectedChat?.thread
+            threadID: selectedChat?.thread,
+            inReplyTo: messages[messages.length-1]?.inReplyTo,
           }),
         });
     

@@ -8,3 +8,4 @@ export const dbUrl = process.env.DB_URL;
 export const dbUser = process.env.DB_USER;
 export const dbPass = process.env.DB_PASS;
 export const dbName = process.env.DB_NAME;
+export const replyToEmail = process.env.REPLY_TO_EMAIL;
