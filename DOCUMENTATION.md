@@ -44,7 +44,7 @@
     3. pnpm run dev
 
   #### Building container
-
+    1.  docker build -t shivamjainn/buildmail .
 
 # Karmayogi 
 
@@ -89,6 +89,8 @@
     3. pnpm run dev
 
   #### Building container
+   NOTE : Make sure postgresDB (online or offline) is running before you build / deploy
+   1.  docker build -f Dockerfile.prod  -t {username}/karmayogi .
 
 # Channels 
 
@@ -120,6 +122,8 @@
     4. pnpm run server:dev
 
   #### Building container
+    For prod build : docker build --build-arg NODE_ENV=prod -t my-express-app .
+    For dev build : docker build --build-arg NODE_ENV=dev -t my-express-app .
 
 
 # Services 
@@ -153,6 +157,8 @@
     4. pnpm run server:dev
 
   #### Building container
+    For prod build : docker build --build-arg NODE_ENV=prod -t my-express-app .
+    For dev build : docker build --build-arg NODE_ENV=dev -t my-express-app .
 
 
 

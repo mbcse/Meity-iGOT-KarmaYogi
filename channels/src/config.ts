@@ -1,6 +1,10 @@
 import dotenv from 'dotenv';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+// Use NODE_ENV directly
+const nodeEnv = process.env.NODE_ENV || 'dev'; // Default to 'dev' if NODE_ENV is not set
+
+// Load environment-specific configuration based on NODE_ENV
+dotenv.config({ path: `.env.${nodeEnv}` });
 
 export const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',');
 export const port = process.env.PORT || 3000;
