@@ -18,7 +18,7 @@ export default function Page() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -26,28 +26,31 @@ export default function Page() {
     e.preventDefault();
 
     try {
-      console.log(urlConstructor('/'))
-      console.log(formData)
+      console.log(urlConstructor('/auth/signup'));
+      console.log(formData);
+
       const response = await fetch(urlConstructor('/auth/signup'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         credentials: 'include', // Ensure cookies are included in the request
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        if(data){
-          router.push('/')
+        if (data) {
+          router.push('/');
         }
       } else {
         const errorData = await response.json();
         console.error('Signup failed:', errorData);
+        // Handle signup error (show message to user, etc.)
       }
     } catch (error) {
       console.error('Error during signup:', error);
+      // Handle network error
     }
   };
 
@@ -90,13 +93,12 @@ export default function Page() {
           </div>
 
           <Button type="submit" aria-label="signup button" className='bg-[#5456DB]'>
-
             Sign Up
           </Button>
           
           <div className='py-4 italic'>
             Have an account already? 
-            <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
+            <Button variant='link' className='text-white hover:text-gray-300' aria-label="sign in button">
               <Link href={'/login'}>
                 Sign In now
               </Link>

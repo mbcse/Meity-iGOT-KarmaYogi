@@ -30,7 +30,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Ensure cookies are included in the request
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -42,9 +42,11 @@ export default function Page() {
       } else {
         const errorData = await response.json();
         console.error('Login failed:', errorData);
+        // Handle login error (show message to user, etc.)
       }
     } catch (error) {
       console.error('Error during login:', error);
+      // Handle network error
     }
   };
 
@@ -62,7 +64,7 @@ export default function Page() {
               <input
                 type="text"
                 className='bg-[#565656] border-none outline-none flex-grow text-white'
-                placeholder='email'
+                placeholder='Email'
                 value={formData.email}
                 onChange={handleChange}
                 name="email"
@@ -86,6 +88,7 @@ export default function Page() {
           </Button>
 
           <div>
+            {/* Uncomment if you want to add a forgot password link */}
             {/* <div className='italic'>
               Forgot your password?
               <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
@@ -95,7 +98,7 @@ export default function Page() {
 
             <div className='italic'>
               Don&apos;t have an account?
-              <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
+              <Button variant='link' className='text-white hover:text-gray-300' aria-label="create account button">
                 <Link href={'/signup'}>
                   Create an account
                 </Link>
