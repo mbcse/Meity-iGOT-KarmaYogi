@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/hooks/use-toast";
 import { submitUserInput, saveBucket, showViewBucket, fetchBuckets } from '@/services/bucket/api';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
     const [inputValue, setInputValue] = useState('');
@@ -25,7 +26,8 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(false);
     const [currentBucket, setCurrentBucket] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false); // New state for dialog
-console.log("Query : ",query);
+    const router = useRouter(); // Hook to handle navigation
+
     const { toast } = useToast();
 
     useEffect(() => {
@@ -35,7 +37,7 @@ console.log("Query : ",query);
     const loadBuckets = async () => {
         try {
             const data = await fetchBuckets();
-            setBuckets(data);
+            setBuckets([]);
         } catch (error) {
             toast({
                 title: "Error",
@@ -120,20 +122,30 @@ console.log("Query : ",query);
         <div className="flex flex-1 h-full overflow-hidden">
             <aside className="w-64 bg-white border-r p-4 overflow-y-auto">
                 <h2 className="text-xl font-semibold mb-4">Buckets</h2>
-                {buckets.map((bucket, index) => (
-                    <div
-                        key={index}
-                        className={`py-2 px-3 flex items-center gap-2 rounded-md cursor-pointer transition-colors ${
-                            currentBucket === bucket ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
-                        }`}
-                        onClick={() => handleShowViewBucket(bucket)}
+                {buckets.length === 0 ? (
+                    <Button
+                        variant="outline"
+                        className="w-full bg-primary text-white"
+                        onClick={() => router.push('/settings')} // Redirect to /settings
                     >
-                        <Folder size={18} />
-                        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-                            {bucket}
-                        </span>
-                    </div>
-                ))}
+                        Setup External DB
+                    </Button>
+                ) : (
+                    buckets.map((bucket, index) => (
+                        <div
+                            key={index}
+                            className={`py-2 px-3 flex items-center gap-2 rounded-md cursor-pointer transition-colors ${
+                                currentBucket === bucket ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
+                            }`}
+                            onClick={() => handleShowViewBucket(bucket)}
+                        >
+                            <Folder size={18} />
+                            <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                                {bucket}
+                            </span>
+                        </div>
+                    ))
+                )}
             </aside>
 
             <main className="flex-1 flex flex-col p-6 overflow-hidden">

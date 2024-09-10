@@ -17,7 +17,11 @@ export function useFetchSubFormData(templateType: string) {
     const fetchTemplates = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/templates/list/${templateType}`
+          `${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/templates/list/${templateType}`,
+          {
+            method: 'GET',
+            credentials: 'include', // This ensures cookies are included
+          }
         );
         const data = await response.json();
         setTemplates(data);
@@ -28,7 +32,10 @@ export function useFetchSubFormData(templateType: string) {
 
     const fetchBuckets = async () => {
       try {
-        const response = await fetch(`/api/db/showviewlist`);
+        const response = await fetch(`/api/db/showviewlist`, {
+          method: 'GET',
+          credentials: 'include', // This ensures cookies are included
+        });
         const data = await response.json();
         setBuckets(data);
       } catch (error) {
