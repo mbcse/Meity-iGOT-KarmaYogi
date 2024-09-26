@@ -126,9 +126,7 @@ BRANCH : feature/005/llmsql
 - Email worker has been tested with actual smtp server connection
 - caching is used in redis , for making sure that the body that is pulled from FileStorage/s3 doesn't have to be called multiple times (saves api costs)
 
-## TODO
 
-- Make a way to connect filestorage for caching values (Maybe URI)
 
 
 ## [pre-dev-0.0.9] - 2024-07-24

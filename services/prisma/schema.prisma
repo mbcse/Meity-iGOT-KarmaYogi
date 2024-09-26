@@ -158,3 +158,37 @@ model Scheduled{
   updatedAt DateTime
   queueStats QueueStatus
 }
+
+model emailsGiven{
+  id        String         @id @default(cuid())
+  email     String
+}
+
+model numbersGiven{
+  id        String         @id @default(cuid())
+  number    String
+}
+
+
+model Database {
+  id     Int     @id @default(autoincrement())
+  url    String  @unique
+  tables Table[]
+}
+
+
+model Table {
+  id          Int       @id @default(autoincrement())
+  name        String
+  database    Database  @relation(fields: [databaseId], references: [id])
+  databaseId  Int
+  columns     Column[]
+}
+
+model Column {
+  id       Int     @id @default(autoincrement())
+  name     String
+  type     String
+  table    Table   @relation(fields: [tableId], references: [id])
+  tableId  Int
+}
