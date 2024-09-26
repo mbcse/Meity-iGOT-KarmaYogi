@@ -97,3 +97,21 @@ BRANCH : feature/005/llmsql
 - TODO : Add toast for notifying user that the bucket is saved now
 - TODO : Add loading states
 - TODO : Refactor thr buckets page in components , one component will have previous buckets , another component can show and interact with LLM bot
+
+
+## [pre-dev-0.0.7] - 2024-07-21
+
+### Added
+
+- Added Jotai for global state management
+- Added mulitple shadcn components
+- Created campaigns page
+- Create modals for sms,email and whatsapp campaign creation
+
+## Changed
+
+- Changes prisma schema and API to adapt with integration
+
+## TODO
+- Create main campaign modal
+- Integrate modals with their apis

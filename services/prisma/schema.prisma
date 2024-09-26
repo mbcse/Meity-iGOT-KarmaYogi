@@ -26,6 +26,11 @@ model Campaign {
   id               String             @id @default(cuid())
   campaignName     String
   timeCreate       DateTime           @default(now())
+  noOfEmails       Int                @default(0)
+  noOfSMS          Int                @default(0)
+  noOfWhatsApp     Int                @default(0)
+  noOfUsers        Int                @default(0)
+  bgImgUrl        String  @default("https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg")
   campaignType     CampaignType[]
   whatsappCampaign WhatsAppCampaign[]
   smsCampaign      SMSCampaign[]
@@ -35,6 +40,7 @@ model Campaign {
 model WhatsAppCampaign {
   id            String         @id @default(cuid())
   campaignID    String
+  campaignTitle       String @default("")
   Number    String
   textbody      String // URL to file
   targeted      Int            @default(0)
@@ -52,6 +58,7 @@ model WhatsAppCampaign {
 model SMSCampaign {
   id            String         @id @default(cuid())
   campaignID    String
+  campaignTitle       String @default("")
   Number    String
   SMSBody       String // URL to file
   targeted      Int            @default(0)
@@ -69,7 +76,7 @@ model SMSCampaign {
 model EmailCampaign {
   id            String         @id @default(cuid())
   campaignID    String
-  subject       String
+  campaignTitle       String @default("")
   fromMail      String
   mailbody      String // URL to file
   targeted      Int            @default(0)

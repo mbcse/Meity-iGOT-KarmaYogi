@@ -13,17 +13,40 @@ const deleteAssociatedCampaigns = async (campaignID: string) => {
 // Fetch all campaigns with associated details
 campaignRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const campaigns = await prisma.campaign.findMany({
-      include: {
-        whatsappCampaign: true,
-        smsCampaign: true,
-        emailCampaign: true,
-      },
-    });
+    const campaigns = await prisma.campaign.findMany();
+
     return res.json(campaigns);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while fetching campaigns' });
+  }
+});
+
+
+campaignRouter.get('/subcampaigns/:campaignID', async (req: Request, res: Response) => {
+  try {
+    const { campaignID } = req.params;
+    console.log(campaignID)
+    const campaign = await prisma.campaign.findUnique({
+      where: {
+        id: campaignID,
+      },
+      select:{
+        emailCampaign: true,
+        smsCampaign: true,
+        whatsappCampaign: true,
+      },
+      
+    });
+
+    if (!campaign) {
+      return res.status(404).json({ error: 'Campaign not found' });
+    }
+
+    return res.json(campaign);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the campaign' });
   }
 });
 
