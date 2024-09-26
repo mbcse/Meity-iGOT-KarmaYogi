@@ -57,7 +57,7 @@ export const BUTTONS: TButtonProps[] = [
       data: {
         props: {
           text: 'Button',
-          url: 'https://www.usewaypoint.com',
+          url: 'https://github.com/shivam-jainn/Meity-iGOT-KarmaYogi',
         },
         style: { padding: { top: 16, bottom: 16, left: 24, right: 24 } },
       },
@@ -70,7 +70,7 @@ export const BUTTONS: TButtonProps[] = [
       type: 'Image',
       data: {
         props: {
-          url: 'https://assets.usewaypoint.com/sample-image.jpg',
+          url: 'https://cdn.prod.website-files.com/5e51b3b0337309d672efd94c/5e5352682c16e81879168a65_mix-3.svg',
           alt: 'Sample product',
           contentAlignment: 'middle',
           linkHref: null,

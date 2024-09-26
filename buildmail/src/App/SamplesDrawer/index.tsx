@@ -17,7 +17,7 @@ export default function SamplesDrawer() {
   const [templates, setTemplates] = React.useState<any[]>([]);
 
   React.useEffect(() => {
-    fetch('http://localhost:3010/templates/list/nocode')
+    fetch(`${import.meta.env.VITE_BACKEND_HOST}/templates/list/nocode`)
       .then((res) => res.json())
       .then((data) => {
         setTemplates(data);
