@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -10,129 +9,86 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useFetchSubFormData } from "./Formhook";
 
-interface Template {
-  id: string;
-  name: string;
-  body: string;
-  type: string;
-  createdAt: string;
-  updatedAt: string;
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from "@/components/ui/command";
+
+
+interface CampaignFormProps {
+  campaignId: string;
+  campaignType: "email" | "sms" | "whatsapp";
+  emails: { value: string; label: string }[];
+  numbers: { value: string; label: string }[];
 }
 
-const numbers = [
-  {
-    value: "9554848382",
-    label: "9554848382",
-  },
-  {
-    value: "4535355532",
-    label: "4535355532",
-  },
-];
-
-export default function SMSCreateCampaign({
+export default function SubCampaignForm({
   campaignId,
-}: {
-  campaignId: string;
-}) {
-  const [openNumber, setOpenNumber] = useState(false);
+  campaignType,
+  emails,
+  numbers,
+}: CampaignFormProps) {
+  const [openNumberOrEmail, setOpenNumberOrEmail] = useState(false);
   const [openBucket, setOpenBucket] = useState(false);
   const [openTemplate, setOpenTemplate] = useState(false);
-  const [date, setDate] = React.useState<Date>();
-  const [time, setTime] = useState("");
-  const [valueNumber, setValueNumber] = useState();
-  const [valueBucket, setValueBucket] = useState("");
-  const [valueTemplate, setValueTemplate] = useState("");
+  const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState<string>("");
+  const [valueNumberOrEmail, setValueNumberOrEmail] = useState<string>("");
+  const [valueBucket, setValueBucket] = useState<string>("");
+  const [valueTemplate, setValueTemplate] = useState<string>("");
   const [campaignName, setCampaignName] = useState("");
   const [message, setMessage] = useState("");
 
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [buckets, setBuckets] = useState<string[]>([]);
+  const { templates, buckets } = useFetchSubFormData(campaignType);
 
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3010/templates/list/sms`,
-        );
-        const data = await response.json();
-        console.log(data);
-
-        setTemplates(data);
-      } catch (error) {
-        console.error("Error fetching templates:", error);
-      }
-    };
-
-    const fetchBuckets = async () => {
-      try {
-        const response = await fetch(`/api/db/showviewlist`);
-        const data = await response.json();
-        console.log(data);
-
-        setBuckets(data);
-      } catch (error) {
-        console.error("Error fetching buckets:", error);
-      }
-    };
-
-    fetchBuckets();
-    fetchTemplates();
-  }, []);
-
   const handleSubmit = async () => {
     try {
+      const payload: Record<string, any> = {
+        campaignName,
+        template: valueTemplate,
+        bucket: valueBucket,
+        scheduled: date,
+        time,
+        message,
+      };
+  
+      // Conditionally add either email or number based on campaignType
+      if (campaignType === "email") {
+        payload.email = valueNumberOrEmail;
+      } else {
+        payload.number = valueNumberOrEmail;
+      }
+  
       const response = await fetch(
-        `http://localhost:3010/campaigns/${campaignId}/create/smscamp`,
+        `http://localhost:3010/campaigns/${campaignId}/create/${campaignType}camp`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            campaignName,
-            template: valueTemplate,
-            bucket: valueBucket,
-            number: valueNumber,
-            scheduled: date,
-            time: time, // Include time in the submission
-          }),
-        },
+          body: JSON.stringify(payload),
+        }
       );
-
+  
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+  
       const result = await response.json();
-
+  
       if (result) {
         const { pathname } = window.location;
         router.push(pathname);
@@ -141,59 +97,59 @@ export default function SMSCreateCampaign({
       console.log(error);
     }
   };
-
-  const handleTemplateSelect = (currentValue: any) => {
-    setValueTemplate(currentValue === valueTemplate ? "" : currentValue);
-    setOpenTemplate(false);
-    if (currentValue !== valueTemplate) {
-      setMessage(""); // Clear the message if a template is selected
-    }
-  };
-
-  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
-    if (e.target.value) {
-      setValueTemplate(""); // Clear the template if a message is being typed
-    }
-  };
+  
+  // Determine options based on campaign type
+  const numberOrEmailOptions =
+    campaignType === "email" ? emails : numbers;
 
   return (
-    <Card>
+    <Card className="max-w-lg mx-auto mt-8 shadow-lg">
       <CardHeader>
-        <CardTitle>SMS Campaign</CardTitle>
-        <CardDescription>Create a new SMS campaign</CardDescription>
+        <CardTitle className="text-xl font-bold text-center">
+          {campaignType === "email" ? "Email" : campaignType === "sms" ? "SMS" : "WhatsApp"} Campaign
+        </CardTitle>
+        <CardDescription className="text-center">
+          Create a new {campaignType === "email" ? "Email" : campaignType === "sms" ? "SMS" : "WhatsApp"} campaign
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4 overflow-auto max-h-[400px] p-4">
+      <CardContent className="flex flex-col gap-4 p-4">
+        {/* Campaign Name Input */}
         <Input
           type="text"
-          className="p-3"
+          className="p-3 border rounded-md"
           placeholder="Campaign Name"
           value={campaignName}
           onChange={(e) => setCampaignName(e.target.value)}
         />
+
+        {/* Message Textarea */}
         <Textarea
           maxLength={120}
-          className="min-h-[180px] p-3 text-gray-500 font-medium text-xl"
+          className="min-h-[180px] p-3 border rounded-md"
           placeholder="Write your message here..."
           value={message}
-          onChange={handleMessageChange}
-          disabled={!!valueTemplate} // Disable message textarea if a template is selected
+          onChange={(e) => {
+            setMessage(e.target.value);
+            if (e.target.value) setValueTemplate("");
+          }}
+          disabled={!!valueTemplate}
         />
 
-        <div className="flex items-center gap-2">
-          <div className="h-[1px] min-w-[100px] bg-gray-300"></div>
-          <div>OR</div>
-          <div className="h-[1px] bg-gray-300 min-w-[100px]"></div>
+        <div className="flex items-center justify-center my-2">
+          <div className="h-[1px] w-full bg-gray-300"></div>
+          <div className="px-3">OR</div>
+          <div className="h-[1px] w-full bg-gray-300"></div>
         </div>
 
+        {/* Template Selection */}
         <Popover open={openTemplate} onOpenChange={setOpenTemplate}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={openTemplate}
-              className="w-full justify-between"
-              disabled={!!message} // Disable template selection if a message is being typed
+              className="w-full justify-between border rounded-md"
+              disabled={!!message}
             >
               {valueTemplate
                 ? templates.find((template) => template.name === valueTemplate)
@@ -212,14 +168,18 @@ export default function SMSCreateCampaign({
                     <CommandItem
                       key={template.name}
                       value={template.name}
-                      onSelect={handleTemplateSelect}
+                      onSelect={(currentValue) => {
+                        setValueTemplate(currentValue);
+                        setMessage("");
+                        setOpenTemplate(false);
+                      }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
                           valueTemplate === template.name
                             ? "opacity-100"
-                            : "opacity-0",
+                            : "opacity-0"
                         )}
                       />
                       {template.name}
@@ -231,33 +191,34 @@ export default function SMSCreateCampaign({
           </PopoverContent>
         </Popover>
 
+        {/* Bucket Selection */}
         <Popover open={openBucket} onOpenChange={setOpenBucket}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={openBucket}
-              className="w-full justify-between"
+              className="w-full justify-between border rounded-md"
             >
               {valueBucket
-                ? buckets.find((bucket) => bucket === valueBucket)?.toString()
+                ? buckets.find((bucket) => bucket === valueBucket)
                 : "Select Bucket..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
             <Command>
-              <CommandInput placeholder="Search Bucket..." />
-              <CommandEmpty>No Bucket found.</CommandEmpty>
+              <CommandInput placeholder="Search bucket..." />
+              <CommandEmpty>No bucket found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
                   {buckets.map((bucket) => (
                     <CommandItem
                       key={bucket}
                       value={bucket}
-                      onSelect={(currentValue: any) => {
+                      onSelect={(currentValue) => {
                         setValueBucket(
-                          currentValue === valueBucket ? "" : currentValue,
+                          currentValue === valueBucket ? "" : currentValue
                         );
                         setOpenBucket(false);
                       }}
@@ -265,7 +226,7 @@ export default function SMSCreateCampaign({
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          valueBucket === bucket ? "opacity-100" : "opacity-0",
+                          valueBucket === bucket ? "opacity-100" : "opacity-0"
                         )}
                       />
                       {bucket}
@@ -277,46 +238,55 @@ export default function SMSCreateCampaign({
           </PopoverContent>
         </Popover>
 
-        <Popover open={openNumber} onOpenChange={setOpenNumber}>
+        {/* Number or Email Selection */}
+        <Popover open={openNumberOrEmail} onOpenChange={setOpenNumberOrEmail}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
-              aria-expanded={openNumber}
-              className="w-full justify-between"
+              aria-expanded={openNumberOrEmail}
+              className="w-full justify-between border rounded-md"
             >
-              {valueNumber
-                ? numbers.find((number) => number.value === valueNumber)?.label
-                : "Select Number..."}
+              {valueNumberOrEmail
+                ? numberOrEmailOptions.find(
+                    (option) => option.value === valueNumberOrEmail
+                  )?.label
+                : `Select ${campaignType === "email" ? "Email" : "Number"}...`}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
             <Command>
-              <CommandInput placeholder="Search Number..." />
-              <CommandEmpty>No Number found.</CommandEmpty>
+              <CommandInput
+                placeholder={`Search ${
+                  campaignType === "email" ? "email" : "number"
+                }...`}
+              />
+              <CommandEmpty>No options found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  {numbers.map((number) => (
+                  {numberOrEmailOptions.map((option) => (
                     <CommandItem
-                      key={number.value}
-                      value={number.value}
-                      onSelect={(currentValue: any) => {
-                        setValueNumber(
-                          currentValue === valueNumber ? "" : currentValue,
+                      key={option.value}
+                      value={option.value}
+                      onSelect={(currentValue) => {
+                        setValueNumberOrEmail(
+                          currentValue === valueNumberOrEmail
+                            ? ""
+                            : currentValue
                         );
-                        setOpenNumber(false);
+                        setOpenNumberOrEmail(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          valueNumber === number.value
+                          valueNumberOrEmail === option.value
                             ? "opacity-100"
-                            : "opacity-0",
+                            : "opacity-0"
                         )}
                       />
-                      {number.label}
+                      {option.label}
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -325,28 +295,25 @@ export default function SMSCreateCampaign({
           </PopoverContent>
         </Popover>
 
+        {/* Date & Time Inputs */}
         <Input
           type="date"
-          className="p-3"
-          placeholder="Date"
+          className="p-3 border rounded-md"
+          placeholder="Schedule Date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
-
         <Input
           type="time"
-          className="p-3"
-          placeholder="Time"
+          className="p-3 border rounded-md"
+          placeholder="Schedule Time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
         />
       </CardContent>
-      <CardFooter>
-        <Button
-          className="bg-green-600 text-white p-2 rounded-md"
-          onClick={handleSubmit}
-        >
-          Submit
+      <CardFooter className="flex justify-center p-4">
+        <Button onClick={handleSubmit} className="px-6 py-2">
+          Create Campaign
         </Button>
       </CardFooter>
     </Card>

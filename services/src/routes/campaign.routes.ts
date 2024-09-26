@@ -246,18 +246,27 @@ campaignRouter.post(
   "/:campaignID/create/:campaignType",
   async (req: Request, res: Response) => {
     const { campaignID, campaignType } = req.params;
-    const { email, number, template, scheduled, campaignName, bucket, time } = req.body;
+    console.log(req.params)
+    const { email, number, template, scheduled, campaignName, bucket, time, message } = req.body;
+    console.log(req.body)
 
     // Validate common fields
-    if (!template || !scheduled || !campaignName || !bucket || !time) {
+    if ((!template && !message )|| !scheduled || !campaignName || !bucket || !time) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
+    if (campaignType === "emailcamp" && !email) {
+      return res.status(400).json({ error: "Email field is required" });
+    }
+
+    console.log("all test passed");
     try {
       const bucketChangedName = (await checkAndUpdateBucket(bucket)) as string;
+      console.log(bucketChangedName);
       const currentTime = new Date();
       const scheduledTime = new Date(scheduled);
 
+      console.log(bucketChangedName);
       let campaignData;
 
       switch (campaignType) {
@@ -272,7 +281,7 @@ campaignRouter.post(
               fromMail: email,
               mailbody: template,
               scheduled: scheduledTime.toISOString(),
-              status: "PENDING",
+              status: "scheduled",
               regionsClicks: [],
               timeToBeSent: time,
               bucket: { connect: { changedName: bucketChangedName } },
@@ -283,6 +292,9 @@ campaignRouter.post(
             data: { noOfEmails: { increment: 1 } },
           });
           console.log(differenceInDays(scheduledTime, currentTime))
+          req.body.work_type = "email";
+          req.body.sub_campaign_id = campaignData.id;
+
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             await handleQueueRequest(req, res, addEmailToQueue, 'Email added to queue', "emaillist");
           }
@@ -292,6 +304,9 @@ campaignRouter.post(
           if (!number) {
             return res.status(400).json({ error: "Number field is required" });
           }
+          console.log("sms camp");
+          console.log(number);
+
           campaignData = await prisma.sMSCampaign.create({
             data: {
               campaign: { connect: { id: campaignID } },
@@ -300,15 +315,22 @@ campaignRouter.post(
               SMSBody: template,
               scheduled: scheduledTime.toISOString(),
               timeToBeSent: time,
-              status: "PENDING",
+              status: "scheduled",
               regionsClicks: [],
               bucket: { connect: { changedName: bucketChangedName } },
             },
           });
+          
+          console.log(campaignData)
+          
           await prisma.campaign.update({
             where: { id: campaignID },
             data: { noOfSMS: { increment: 1 } },
           });
+
+          req.body.work_type = "SMS";
+          req.body.sub_campaign_id = campaignData.id;
+
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             await handleQueueRequest(req, res, addSMSToQueue, 'SMS added to queue', "smslist");
           }
@@ -325,7 +347,7 @@ campaignRouter.post(
               Number: number,
               textbody: template,
               scheduled: scheduledTime.toISOString(),
-              status: "PENDING",
+              status: "scheduled",
               regionsClicks: [],
               timeToBeSent: time,
               bucket: { connect: { changedName: bucketChangedName } },
@@ -335,6 +357,10 @@ campaignRouter.post(
             where: { id: campaignID },
             data: { noOfWhatsApp: { increment: 1 } },
           });
+
+          req.body.work_type = "whatsapp";
+          req.body.sub_campaign_id = campaignData.id;
+
           if (differenceInDays(scheduledTime, currentTime) < 1) {
             await handleQueueRequest(req, res, addWhatsappToQueue, 'Whatsapp added to queue', "whatsapplist");
           }

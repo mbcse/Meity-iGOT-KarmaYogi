@@ -1,12 +1,14 @@
 "use client";
-
+import { useState } from "react";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table";
-
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -21,15 +23,30 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: number; timeCreate: string }, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "timeCreate", desc: true },
+  ]);
+
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(), // Enable sorting
   });
+
+  const router = useRouter();
+
+  const handleRowClick = (id: number) => {
+    router.push(`/campaigns/${id}`);
+  };
 
   return (
     <div className="rounded-md border">
@@ -56,6 +73,8 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleRowClick(row.original.id)} // Redirect on row click
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-center">

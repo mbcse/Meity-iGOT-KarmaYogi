@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Mails, MessagesSquare } from "lucide-react";
+import { format } from "date-fns";  // Import the format function
 
 export type CampCardType = {
   id: number;
@@ -10,13 +11,7 @@ export type CampCardType = {
   noOfEmails?: number;
   noOfWhatsApp?: number;
   noOfUsers?: number;
-  status:
-    | "scheduled"
-    | "running"
-    | "completed"
-    | "cancelled"
-    | "draft"
-    | "failed";
+  timeCreate: string; 
 };
 
 interface SubCampaigns {
@@ -25,24 +20,6 @@ interface SubCampaigns {
   noOfWhatsApp?: number;
 }
 
-const statusStyles = {
-  scheduled: "bg-yellow-200 text-yellow-700",
-  running: "bg-green-300 text-green-700",
-  completed: "bg-blue-300 text-blue-700",
-  cancelled: "bg-red-300 text-red-700",
-  draft: "bg-gray-300 text-gray-700",
-  failed: "bg-red-300 text-red-700",
-};
-
-export const CampaignBadge = ({ status }: { status: string }) => {
-  const statusClass = statusStyles[status as keyof typeof statusStyles] || "";
-
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs ${statusClass}`}>
-      {status}
-    </span>
-  );
-};
 
 export const columns: ColumnDef<CampCardType>[] = [
   {
@@ -88,15 +65,12 @@ export const columns: ColumnDef<CampCardType>[] = [
     cell: info => <div className="text-center">{info.getValue()}</div>,
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "timeCreate",
+    header: "Time Created",
     cell: ({ row }) => {
-      const status = row.original.status;
-      return (
-        <div className="flex justify-center">
-          <CampaignBadge status={status} />
-        </div>
-      );
+      const timeCreate = row.original.timeCreate;
+      const formattedTime = format(new Date(timeCreate), "dd-MM-yy hh:mm a");
+      return <div className="text-center">{formattedTime}</div>;
     },
   },
 ];
