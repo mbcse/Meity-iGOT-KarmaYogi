@@ -35,7 +35,7 @@ model Campaign {
 model WhatsAppCampaign {
   id            String         @id @default(cuid())
   campaignID    String
-  fromNumber    String
+  Number    String
   textbody      String // URL to file
   targeted      Int            @default(0)
   bounced       Int            @default(0)
@@ -52,7 +52,7 @@ model WhatsAppCampaign {
 model SMSCampaign {
   id            String         @id @default(cuid())
   campaignID    String
-  fromNumber    String
+  Number    String
   SMSBody       String // URL to file
   targeted      Int            @default(0)
   bounced       Int            @default(0)
