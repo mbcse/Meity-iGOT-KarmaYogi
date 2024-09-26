@@ -8,18 +8,18 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
 }
 
 model Buckets {
-  id            String      @id @default(cuid())
-  name          String    
-  changedName   String    @unique
-  query         String
-  createdAt     DateTime
-  updatedAt     DateTime
+  id                String             @id @default(cuid())
+  name              String
+  changedName       String             @unique
+  query             String
+  createdAt         DateTime
+  updatedAt         DateTime
   whatsappCampaigns WhatsAppCampaign[]
   smsCampaigns      SMSCampaign[]
   emailCampaigns    EmailCampaign[]
@@ -33,7 +33,7 @@ model Campaign {
   noOfSMS          Int                @default(0)
   noOfWhatsApp     Int                @default(0)
   noOfUsers        Int                @default(0)
-  bgImgUrl        String  @default("https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg")
+  bgImgUrl         String             @default("https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg")
   campaignType     CampaignType[]
   whatsappCampaign WhatsAppCampaign[]
   smsCampaign      SMSCampaign[]
@@ -43,14 +43,15 @@ model Campaign {
 model WhatsAppCampaign {
   id            String         @id @default(cuid())
   campaignID    String
-  campaignTitle       String @default("")
-  Number    String
-  bucket    Buckets  @relation(fields: [bucketID], references: [id])
-  bucketID  String
+  campaignTitle String         @default("")
+  Number        String
+  bucket        Buckets        @relation(fields: [bucketID], references: [id])
+  bucketID      String
   textbody      String // URL to file
   targeted      Int            @default(0)
   bounced       Int            @default(0)
   scheduled     DateTime
+  timeToBeSent  String         @default("00:00")
   status        CampaignStatus
   unsubscribed  Int            @default(0)
   regionsClicks String[]
@@ -63,14 +64,15 @@ model WhatsAppCampaign {
 model SMSCampaign {
   id            String         @id @default(cuid())
   campaignID    String
-  campaignTitle       String @default("")
-  Number    String
-  bucket    Buckets  @relation(fields: [bucketID], references: [id])
-  bucketID  String 
+  campaignTitle String         @default("")
+  Number        String
+  bucket        Buckets        @relation(fields: [bucketID], references: [id])
+  bucketID      String
   SMSBody       String // URL to file
   targeted      Int            @default(0)
   bounced       Int            @default(0)
   scheduled     DateTime
+  timeToBeSent  String         @default("00:00")
   status        CampaignStatus
   unsubscribed  Int            @default(0)
   regionsClicks String[]
@@ -83,17 +85,18 @@ model SMSCampaign {
 model EmailCampaign {
   id            String         @id @default(cuid())
   campaignID    String
-  campaignTitle       String @default("")
+  campaignTitle String         @default("")
   fromMail      String
   mailbody      String // URL to file
-  bucket    Buckets  @relation(fields: [bucketID], references: [id]) 
-  bucketID  String 
+  bucket        Buckets        @relation(fields: [bucketID], references: [id])
+  bucketID      String
   targeted      Int            @default(0)
   bounced       Int            @default(0)
   opened        Int            @default(0)
   mobile        Int            @default(0)
   desktop       Int            @default(0)
   scheduled     DateTime
+  timeToBeSent  String         @default("00:00")
   status        CampaignStatus
   unsubscribed  Int            @default(0)
   spamReports   Int            @default(0)
@@ -105,15 +108,15 @@ model EmailCampaign {
 }
 
 model CTALink {
-  id                 String              @id @default(cuid())
-  url                String
-  clicks             Int                 @default(0)
-  mobile             Int                 @default(0)
-  desktop            Int                 @default(0)
-  regionsClicks      String[]
-  whatsappCampaigns  WhatsAppCampaign[]  @relation("WhatsAppCampaignCTALinks")
-  smsCampaigns       SMSCampaign[]       @relation("SMSCampaignCTALinks")
-  emailCampaigns     EmailCampaign[]     @relation("EmailCampaignCTALinks")
+  id                String             @id @default(cuid())
+  url               String
+  clicks            Int                @default(0)
+  mobile            Int                @default(0)
+  desktop           Int                @default(0)
+  regionsClicks     String[]
+  whatsappCampaigns WhatsAppCampaign[] @relation("WhatsAppCampaignCTALinks")
+  smsCampaigns      SMSCampaign[]      @relation("SMSCampaignCTALinks")
+  emailCampaigns    EmailCampaign[]    @relation("EmailCampaignCTALinks")
 }
 
 enum CampaignType {
@@ -130,11 +133,28 @@ enum CampaignStatus {
 }
 
 model Template {
-  id            String         @id @default(cuid())
-  name          String
-  type          CampaignType[]
-  body          String // URL to file
-  createdAt     DateTime
-  updatedAt     DateTime
-  noCode        Boolean @default(false)
+  id        String         @id @default(cuid())
+  name      String
+  type      CampaignType[]
+  body      String // URL to file
+  createdAt DateTime
+  updatedAt DateTime
+  noCode    Boolean        @default(false)
+}
+
+enum QueueStatus {
+  PENDING
+  QUEUED
+}
+
+model Scheduled{
+  id        String         @id @default(cuid())
+  subCampaignID String
+  type     CampaignType[]
+  scheduled DateTime
+  timeToBeSent String
+  status    CampaignStatus
+  createdAt DateTime
+  updatedAt DateTime
+  queueStats QueueStatus
 }

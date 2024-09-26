@@ -19,31 +19,31 @@ export interface I_Whatsapp {
 }
 
 export interface I_EmailQueue {
-    emailList: I_Email[];
-    campaign_id: string;
+    emailList: string[];
+    sub_campaign_id: string;
 }
 
 export interface I_EmailQueue_NC {
-    email: I_Email[];
+    email: string[];
     work_type: string;
 }
 
 
 export interface I_SMSQueue {
-    phoneNumberList: I_SMS[];
-    campaign_id: string;
+    numberList: string[];
+    sub_campaign_id: string;
 }
 
 export interface I_WhatsappQueue {
-    phoneNumberList: I_Whatsapp[];
-    campaign_id: string;
+    numberList: string[];
+    sub_campaign_id: string;
 }
 
-async function addItemsToQueue(queue: Queue, items: any[], campaign_id: string) {
+async function addItemsToQueue(queue: Queue, items: any[], sub_campaign_id: string) {
     const results = [];
     for (const item of items) {
         try {
-            const result = await queue.add(campaign_id, item);
+            const result = await queue.add(sub_campaign_id, item);
             results.push(result);
         } catch (error) {
             console.error(`Failed to add item ${JSON.stringify(item)} to queue:`, error);
@@ -52,17 +52,17 @@ async function addItemsToQueue(queue: Queue, items: any[], campaign_id: string) 
     return results;
 }
 
-export async function addEmailToQueue({ emailList, campaign_id }: I_EmailQueue) {
-    return await addItemsToQueue(EmailQueue, emailList.map(email => ({ email })), campaign_id);
+export async function addEmailToQueue({ emailList, sub_campaign_id }: I_EmailQueue) {
+    return await addItemsToQueue(EmailQueue, emailList, sub_campaign_id);
 }
 
-export async function addSMSToQueue({ phoneNumberList, campaign_id }: I_SMSQueue) {
-    console.log(phoneNumberList)
-    return await addItemsToQueue(SMSQueue, phoneNumberList.map(phoneNumber => ({ phoneNumber })), campaign_id);
+export async function addSMSToQueue({ numberList, sub_campaign_id }: I_SMSQueue) {
+    console.log("smslist",numberList)
+    return await addItemsToQueue(SMSQueue, numberList, sub_campaign_id);
 }
 
-export async function addWhatsappToQueue({ phoneNumberList, campaign_id }: I_WhatsappQueue) {
-    return await addItemsToQueue(WhatsappQueue, phoneNumberList.map(phoneNumber => ({ phoneNumber })), campaign_id);
+export async function addWhatsappToQueue({ numberList, sub_campaign_id }: I_WhatsappQueue) {
+    return await addItemsToQueue(WhatsappQueue, numberList, sub_campaign_id);
 }
 
 async function addItemsToQueue_NonCampaign(queue: Queue, item: any, work_type: string) {
