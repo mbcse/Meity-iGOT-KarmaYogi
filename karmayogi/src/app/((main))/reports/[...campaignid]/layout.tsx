@@ -9,26 +9,7 @@ export default function layout({children,sms,whatsapp,email}:{
 }) {
   return (
     <section className='flex flex-col gap-2 p-8 sm:p-2 '>
-
         {children}
-
-    <div className='p-4'>
-
-        <Tabs defaultValue="sms" >
-  <TabsList>
-    <TabsTrigger value="sms">sms</TabsTrigger>
-    <TabsTrigger value="whatsapp">whatsapp</TabsTrigger>
-    <TabsTrigger value="email">email</TabsTrigger>
-
-  </TabsList>
-  <TabsContent value="sms" >{sms}</TabsContent>
-  <TabsContent value="whatsapp" >{whatsapp}</TabsContent>
-  <TabsContent value="email" >{email}</TabsContent>
-
-</Tabs>
-    </div>
-
-
     </section>
   )
 }

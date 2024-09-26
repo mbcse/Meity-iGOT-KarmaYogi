@@ -16,7 +16,7 @@ import {
 
 // Define the campaign data interface
 export interface I_GlobalChart_EmailTitleComparision {
-  campaignName: string;
+  subCampaignName: string;
   targeted: number;
   bounced: number;
   opened: number;
@@ -28,7 +28,7 @@ export interface I_GlobalChart_EmailTitleComparision {
 
 
 // Define the metric keys
-const metrics: Array<keyof Omit< I_GlobalChart_EmailTitleComparision, 'campaignName'>> = [
+const metrics: Array<keyof Omit< I_GlobalChart_EmailTitleComparision, 'subCampaignName'>> = [
   "targeted",
   "bounced",
   "opened",
@@ -42,7 +42,7 @@ const transformData = (data:  I_GlobalChart_EmailTitleComparision[]) => {
   return metrics.map((metric) => {
     const entry: any = { metric }
     data.forEach((campaign) => {
-      entry[campaign.campaignName] = campaign[metric]
+      entry[campaign.subCampaignName] = campaign[metric]
     })
     return entry
   })
@@ -52,8 +52,8 @@ const transformData = (data:  I_GlobalChart_EmailTitleComparision[]) => {
 const chartConfig = (data:  I_GlobalChart_EmailTitleComparision[]): ChartConfig => {
   const config: ChartConfig = {}
   data.forEach((campaign, index) => {
-    config[campaign.campaignName] = {
-      label: campaign.campaignName,
+    config[campaign.subCampaignName] = {
+      label: campaign.subCampaignName,
       color: `hsl(${index * 30}, 70%, 50%)`, // Dynamic color
     }
   })
@@ -65,7 +65,7 @@ export function EmailTitleComparision({ data }: { data:  I_GlobalChart_EmailTitl
   const config = chartConfig(data)
 
   return (
-    <Card className="min-w-[500px]">
+    <Card className="min-w-[500px] w-full">
       <CardHeader>
         <CardTitle>Email Campaign Metrics Comparison</CardTitle>
         <CardDescription>
@@ -88,9 +88,9 @@ export function EmailTitleComparision({ data }: { data:  I_GlobalChart_EmailTitl
             <Legend />
             {data.map((campaign) => (
               <Bar
-                key={campaign.campaignName}
-                dataKey={campaign.campaignName}
-                fill={config[campaign.campaignName]?.color || "#000"} // Fallback color
+                key={campaign.subCampaignName}
+                dataKey={campaign.subCampaignName}
+                fill={config[campaign.subCampaignName]?.color || "#000"} // Fallback color
                 radius={[0, 0, 0, 0]}
               />
             ))}
