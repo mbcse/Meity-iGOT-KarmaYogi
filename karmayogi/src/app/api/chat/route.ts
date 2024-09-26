@@ -105,8 +105,7 @@ const prompt = `Convert {userinput} to a SINGLE LINE raw SQL query, no comments,
         });
 
         const tableDataJson = await tableData.json();
-
-        return NextResponse.json(tableDataJson);
+        return NextResponse.json({tableData:tableDataJson,sqlQuery:data.sqlQuery});
     } catch (error) {
         if (error instanceof Error) {
             logger.error({ message: error.message, stack: error.stack });

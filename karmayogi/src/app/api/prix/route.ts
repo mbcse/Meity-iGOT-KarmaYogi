@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     console.log("Quoted SQL Query:", quotedSqlQuery);
 
     const result = await prisma.$queryRawUnsafe(quotedSqlQuery);
+    console.log(result)
     return NextResponse.json({ result });
   } catch (error) {
     console.error(error);

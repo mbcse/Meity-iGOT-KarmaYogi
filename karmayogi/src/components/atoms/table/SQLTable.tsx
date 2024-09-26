@@ -9,32 +9,28 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-export default function SQLTable({responseData}:{
-    responseData:any
-}) {
+export default function SQLTable({ responseData }: { responseData: any }) {
     const [tableData, setTableData] = useState([]);
     const [tableHeads, setTableHeads] = useState<string[]>([]);
-    const [query, setQuery] = useState("A table for showing all the record");
 
     useEffect(() => {
         const fitData = async () => {
             try {
-                console.log(responseData);
-                if (responseData && responseData.length > 0) {
-                    setTableHeads(Object.keys(responseData[0]));
-                    setTableData(responseData);
+                if (responseData && responseData.result && responseData.result.length > 0) {
+                    setTableHeads(Object.keys(responseData.result[0]));
+                    setTableData(responseData.result);
                 }
             } catch (error) {
                 console.error('There was a problem fetching the data:', error);
             }
         };
 
-        fitData(); 
+        fitData();
     }, [responseData]);
 
+   
     return (
         <Table>
-            <TableCaption>{query}</TableCaption>
             <TableHeader>
                 <TableRow>
                     {tableHeads.map((head, index) => (

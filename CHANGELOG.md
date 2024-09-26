@@ -85,3 +85,15 @@ BRANCH : feature/005/llmsql
 - Prisma schema in /Services , added bucket model
 
 
+## [pre-dev-0.0.6] - 2024-07-16
+
+### Added
+
+- Added integration to /buckets
+- Buckets shows previously saved bucket, creates and saves buckets .
+
+### TODO
+- TODO : Finish UI and squash quirky bugs , Make sure SQLTable component can handle both saved buckets and fresh SQLLLM buckets data . They are different in nature and hence SQLComponent is failing to load saved bucket data .
+- TODO : Add toast for notifying user that the bucket is saved now
+- TODO : Add loading states
+- TODO : Refactor thr buckets page in components , one component will have previous buckets , another component can show and interact with LLM bot

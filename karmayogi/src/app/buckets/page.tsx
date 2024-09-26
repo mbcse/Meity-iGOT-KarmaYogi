@@ -1,13 +1,26 @@
 "use client";
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronUp } from 'lucide-react';
 import SQLTable from '@/components/atoms/table/SQLTable';
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { Input } from "@/components/ui/input";
 
 export default function Page() {
     const [inputValue, setInputValue] = useState('');
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(false);
+    const [bucketName, setBucketName] = useState('');
+    const [query, setQuery] = useState('');
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -24,7 +37,8 @@ export default function Page() {
                 throw new Error('An error occurred while processing your request.');
             }
             const data = await res.json();
-            setResponse(data.result);
+            setResponse(data.tableData);
+            setQuery(data.sqlQuery);
             setError(false);
         } catch (err) {
             setError(true);
@@ -32,15 +46,68 @@ export default function Page() {
         }
     };
 
+    const handleSaveBucket = async () => {
+        try {
+            const res = await fetch('/api/db/createview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ viewName: bucketName, sqlQuery: query }),
+            });
+
+            if (!res.ok) {
+                throw new Error('An error occurred while processing your request.');
+            }
+
+            console.log('Bucket Saved Successfully');
+        } catch (error) {
+            console.log('An error occurred while processing your request.');
+        }
+    };
+
+    const showViewBucket = async (viewName: string)=>{
+        try {
+            const res = await fetch(`/api/db/showview?viewName=${viewName}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error('An error occurred while processing your request.');
+            }
+
+            const data = await res.json();
+
+            setResponse(data);
+        } catch (error) {
+            console.log('An error occurred while processing your request.');
+            
+        }
+    }
+
+    const [buckets, setBuckets] = useState([]);
+
+    useEffect(() => {
+        fetch('/api/db/showviewlist')
+            .then((res) => res.json())
+            .then((data) => setBuckets(data))
+            .catch((error) => console.log('An error occurred while fetching buckets.'));
+    }, []);
+
     return (
         <section className='flex h-screen'>
             <div className='w-1/5'>
                 <div className='text-white bg-black py-6 px-4 flex gap-2 items-center font-medium hover:bg-white/80 hover:text-black cursor-pointer'>
                     Saved Buckets
                 </div>
-                {[1, 2, 3, 4, 5].map((item, index) => (
-                    <div key={index} className='py-6 px-4 flex gap-2 items-center hover:bg-gray-100 hover:text-black cursor-pointer'>
-                        Bucket {item}
+                {buckets.map((bucket: string, index: number) => (
+                    <div key={index} 
+                        className='py-6 px-4 flex gap-2 items-center hover:bg-gray-100 hover:text-black cursor-pointer'
+                        onClick={() => showViewBucket(bucket)}
+                        >
+                        {bucket}
                     </div>
                 ))}
             </div>
@@ -50,7 +117,7 @@ export default function Page() {
                         <SQLTable responseData={response} />
                         :
                         error && <div className='mt-4 p-4 bg-red-100 text-red-800 rounded'>
-                            Error: Couldnt find anything
+                            Error: Couldn’t find anything
                         </div>
                     }
                 </div>
@@ -73,11 +140,30 @@ export default function Page() {
                         </Button>
                         {
                             response &&
-                             <Button
-                                className='rounded-full absolute right-16 top-1/2 transform -translate-y-1/2'                             
-                             >
-                                Save
-                            </Button>
+                            <Dialog>
+                                <DialogTrigger>
+                                    <Button className='mt-4'>Save Bucket</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Do you want to save this table?</DialogTitle>
+                                        <DialogDescription>
+                                            <Input
+                                                type='text'
+                                                placeholder='Enter your bucket name'
+                                                value={bucketName}
+                                                onChange={(e) => setBucketName(e.target.value)}
+                                            />
+                                            <Button
+                                                className='mt-2'
+                                                onClick={handleSaveBucket}
+                                            >
+                                                Save
+                                            </Button>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                         }
                     </div>
                 </form>

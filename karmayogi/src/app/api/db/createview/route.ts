@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
     try {
         const { viewName, sqlQuery } = await req.json(); // Specify the name of the view
-
+        console.log(viewName, sqlQuery);
         const response = await fetch('http://localhost:3010/buckets/create', {
             method: 'POST',
             headers: {
