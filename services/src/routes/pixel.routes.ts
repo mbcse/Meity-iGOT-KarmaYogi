@@ -6,8 +6,9 @@ const pixelRouter = express.Router();
 
 pixelRouter.get("/email/:id", async (req: Request, res: Response) => {
   try {
-    // Set response headers for a transparent 1x1 pixel
     const { id } = req.params;
+
+    // Set response headers for a transparent 1x1 pixel
     res.set({
       'Content-Type': 'image/gif',
       'Cache-Control': 'no-store, no-cache, must-revalidate, private',
@@ -15,42 +16,34 @@ pixelRouter.get("/email/:id", async (req: Request, res: Response) => {
       'Expires': '0'
     });
 
-    // Extract device type from request query or headers
-    const deviceType = req.query.deviceType?.toString() || 'desktop';
+    // Check if the deviceType was passed as a query parameter
+    let deviceType = req.query.deviceType?.toString();
 
-    // Increment counters based on device type
-    let updateData: Prisma.EmailCampaignUpdateInput = {
-      opened: {
-        increment: 1
-      }
-    };
-    if (deviceType === "mobile") {
-      updateData = {
-        ...updateData,
-        mobile: {
-          increment: 1
-        }
-      };
-    } else {
-      updateData = {
-        ...updateData,
-        desktop: {
-          increment: 1
-        }
-      };
+    // Fallback to checking the User-Agent header
+    if (!deviceType) {
+      const userAgent = req.get('User-Agent');
+      const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent as string);
+      deviceType = isMobile ? 'mobile' : 'desktop';
     }
 
-    // Assuming currLocation is extracted from request headers or IP location middleware
-    const currLocation = (req.headers['x-forwarded-for'] as string) || (req.connection.remoteAddress as string);
+    // Increment counters based on the detected device type
+    let updateData: Prisma.EmailCampaignUpdateInput = {
+      opened: { increment: 1 },
+    };
 
-    // Fetch the current regionsClicks value
+    if (deviceType === 'mobile') {
+      updateData.mobile = { increment: 1 };
+    } else {
+      updateData.desktop = { increment: 1 };
+    }
+
+    // Get the IP address from the request headers (x-forwarded-for for proxies)
+    const ip = (req.headers['x-forwarded-for'] as string) || req.connection.remoteAddress;
+
+    // Fetch the current regionsClicks value from the database
     const emailCampaign = await prisma.emailCampaign.findUnique({
-      where: {
-        id: id
-      },
-      select: {
-        regionsClicks: true
-      }
+      where: { id: id },
+      select: { regionsClicks: true },
     });
 
     if (emailCampaign && emailCampaign.regionsClicks) {
@@ -61,24 +54,22 @@ pixelRouter.get("/email/:id", async (req: Request, res: Response) => {
         return acc;
       }, {});
 
-      // Update the regionsClicks object
-      if (regionsClicks[currLocation]) {
-        regionsClicks[currLocation] += 1;
-      } else {
-        regionsClicks[currLocation] = 1;
+      // Update the regionsClicks object based on IP address
+      if (ip && regionsClicks[ip]) {
+        regionsClicks[ip] += 1;
+      } else if (ip) {
+        regionsClicks[ip] = 1;
       }
 
       // Convert the updated regionsClicks object back to an array
-      const updatedRegionsClicks = Object.entries(regionsClicks).map(([region, count]) => `${region}:${count}`);
+      const updatedRegionsClicks = Object.entries(regionsClicks).map(([ip, count]) => `${ip}:${count}`);
 
       // Update email campaign statistics using Prisma
       await prisma.emailCampaign.update({
-        where: {
-          id: id
-        },
+        where: { id: id },
         data: {
           ...updateData,
-          regionsClicks: updatedRegionsClicks
+          regionsClicks: updatedRegionsClicks // Update regionsClicks with new data
         }
       });
 

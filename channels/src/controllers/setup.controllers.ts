@@ -5,6 +5,7 @@ import { ImapFlow } from 'imapflow';
 import { simpleParser,AddressObject,EmailAddress } from 'mailparser';
 import nodemailer from 'nodemailer';
 import { generateThreadId } from '../models/Email';
+
 export const setupAccountController = async (req: Request, res: Response) => {
   try {
     const accountData: IEmailAccount = req.body;
