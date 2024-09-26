@@ -5,6 +5,7 @@ import { CampaignStatus, PrismaClient } from '@prisma/client';
 const producerRouter = express.Router();
 const prisma = new PrismaClient();
 
+import 'dotenv/config';
 
 export async function handleQueueRequest(
     req: Request, 
@@ -21,7 +22,7 @@ export async function handleQueueRequest(
         const bucket = payload.bucket;
         console.log("\nbucket for pulling data:  ", bucket);
         
-        const response = await axios.post(`http://localhost:3000/api/db/showview/get${typeOfList}`, { bucketName: bucket });
+        const response = await axios.post(`${process.env.DB_API_BASE_URL}/get${typeOfList}`, { bucketName: bucket });
         console.log("\nresponse", response.data);
 
         let camptype = typeOfList.slice(0, -4);
@@ -45,13 +46,12 @@ export async function handleQueueRequest(
 
         const addedToQueue = await addToQueue(queue_payload);
 
-
-        console.log("added to queue : " ,addedToQueue);
+        console.log("added to queue: ", addedToQueue);
         // Ensure the response is sent in JSON format
-        return JSON.stringify({ message: successMessage });
+        return res.json({ message: successMessage });
     } catch (error) {
         console.error('Error adding to queue:', error);
-        return error;
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }
 
