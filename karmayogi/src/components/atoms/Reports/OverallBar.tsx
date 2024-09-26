@@ -6,9 +6,21 @@ import { CommType } from '@/states/chat.atom';
 // Function to fetch stats data from the API
 async function fetchStats(): Promise<ReportCardProps[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/stats/total-stats`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/stats/total-stats`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Include credentials (cookies) in the request
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
     const data = await response.json();
-
+    console.log(data);
+    
     // Map the API response to ReportCardProps format
     const mappedData: ReportCardProps[] = [
       {

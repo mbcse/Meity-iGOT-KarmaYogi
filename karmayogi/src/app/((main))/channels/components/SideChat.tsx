@@ -77,7 +77,8 @@ export default function SideChat() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/chat/${selectedAccount}/messagesList`
+        `${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/chat/${selectedAccount}/messagesList`,
+        { credentials: 'include' }  // Include credentials for cookies
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -96,7 +97,8 @@ export default function SideChat() {
     const fetchAccounts = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/accounts/${chatCommType}`
+          `${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/accounts/${chatCommType}`,
+          { credentials: 'include' }  // Include credentials for cookies
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -116,7 +118,8 @@ export default function SideChat() {
   const syncEmails = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/chat/syncemail/${selectedAccount}`
+        `${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/chat/syncemail/${selectedAccount}`,
+        { credentials: 'include' }  // Include credentials for cookies
       );
 
       if (!response.ok) {

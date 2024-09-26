@@ -2,6 +2,10 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { allowedOrigins, port } from "./config";
+
+import { requireAuth } from "./middleware/authMiddleware"; 
+
 import authRouter from "./routes/auth.routes";
 import producerRouter from "./routes/producer.routes";
 import bucketsRouter from "./routes/buckets.routes";
@@ -9,8 +13,6 @@ import pixelRouter from "./routes/pixel.routes";
 import statsRouter from "./routes/stats.routes";
 import campaignRouter from "./routes/campaign.routes";
 import templateRouter from "./routes/templates.routes";
-import scheduleRouter from "./routes/schedule.routes";
-import { allowedOrigins, port } from "./config";
 
 const app = express();
 
@@ -38,6 +40,10 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 
 app.use("/auth", authRouter);
+
+app.use(requireAuth);
+
+
 app.use("/producer", producerRouter);
 app.use("/buckets", bucketsRouter);
 app.use("/pixels", pixelRouter);

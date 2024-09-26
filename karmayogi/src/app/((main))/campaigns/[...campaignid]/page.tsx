@@ -40,18 +40,23 @@ export default function Page() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns/${params.campaignid}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns/${params.campaignid}`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         console.log('Fetched campCardParentData:', data);
-        setCampCardParentData(data);
+      setCampCardParentData(data);
         setWhatsappCampaigns(data.whatsappCampaign);
         setEmailCampaigns(data.emailCampaign);
         setSmsCampaigns(data.smsCampaign);
-      } catch (error) {
-        console.error('Error fetching campCardParentData:', error);
-      }
+    } catch (error) {
+      console.error('Error fetching campCardParentData:', error);
+    }
     };
 
     fetchData();

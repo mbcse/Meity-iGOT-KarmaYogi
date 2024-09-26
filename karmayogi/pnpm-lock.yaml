@@ -16,10 +16,10 @@ importers:
         version: 3.9.0(react-hook-form@7.52.1(react@18.3.1))
       '@langchain/core':
         specifier: ^0.2.15
-        version: 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+        version: 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       '@langchain/groq':
         specifier: ^0.0.13
-        version: 0.0.13(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+        version: 0.0.13(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       '@prisma/client':
         specifier: 5.16.2
         version: 5.16.2(prisma@5.16.2)
@@ -59,9 +59,15 @@ importers:
       '@radix-ui/react-toast':
         specifier: ^1.2.1
         version: 1.2.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@tanstack/react-query':
+        specifier: ^5.55.4
+        version: 5.55.4(react@18.3.1)
       '@tanstack/react-table':
         specifier: ^8.19.3
         version: 8.19.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      axios:
+        specifier: ^1.7.7
+        version: 1.7.7
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -88,7 +94,7 @@ importers:
         version: 9.0.2
       langchain:
         specifier: ^0.2.9
-        version: 0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0)
+        version: 0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0)
       lucide-react:
         specifier: ^0.408.0
         version: 0.408.0(react@18.3.1)
@@ -1774,6 +1780,14 @@ packages:
   '@swc/helpers@0.5.5':
     resolution: {integrity: sha512-KGYxvIOXcceOAbEk4bi/dVLEK9z8sZ0uBB3Il5b1rhfClSpcX0yfRO0KmTkqR2cnQDymwLB+25ZyMzICg/cm/A==}
 
+  '@tanstack/query-core@5.55.4':
+    resolution: {integrity: sha512-uoRqNnRfzOH4OMIoxj8E2+Us89UIGXfau981qYJWsNMkFS1GXR4UIyzUTVGq4N7SDLHgFPpo6IOazqUV5gkMZA==}
+
+  '@tanstack/react-query@5.55.4':
+    resolution: {integrity: sha512-e3uX5XkLD9oTV66/VsVpkYz3Ds/ps/Yk+V5d89xthAbtNIKKBEm4FdNb9yISFzGEGezUzVO68qmfmiSrtScvsg==}
+    peerDependencies:
+      react: ^18 || ^19
+
   '@tanstack/react-table@8.19.3':
     resolution: {integrity: sha512-MtgPZc4y+cCRtU16y1vh1myuyZ2OdkWgMEBzyjYsoMWMicKZGZvcDnub3Zwb6XF2pj9iRMvm1SO1n57lS0vXLw==}
     engines: {node: '>=12'}
@@ -2015,6 +2029,9 @@ packages:
   axe-core@4.9.1:
     resolution: {integrity: sha512-QbUdXJVTpvUTHU7871ppZkdOLBeGUKBQWHkHrvN2V9IQWGMt61zf3B45BtzjxEJzYuj0JBjBZP/hmYS/R9pmAw==}
     engines: {node: '>=4'}
+
+  axios@1.7.7:
+    resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
 
   axobject-query@3.1.1:
     resolution: {integrity: sha512-goKlv8DZrK9hUh975fnHzhNIO4jUnFCfv/dszV5VwUGDFjI6vQ2VwoyjYjYNEbBE8AH87TduWP5uyDR1D+Iteg==}
@@ -3715,6 +3732,9 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
+  proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -4883,13 +4903,13 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@langchain/core@0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)':
+  '@langchain/core@0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.36(@langchain/core@0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7))(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      langsmith: 0.1.36(@langchain/core@0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7))(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -4901,10 +4921,10 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/groq@0.0.13(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)':
+  '@langchain/groq@0.0.13(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)':
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
-      '@langchain/openai': 0.1.3(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      '@langchain/openai': 0.1.3(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))
       groq-sdk: 0.3.3
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
@@ -4913,9 +4933,9 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/openai@0.1.3(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))':
+  '@langchain/openai@0.1.3(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))':
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       js-tiktoken: 1.0.12
       openai: 4.52.7
       zod: 3.23.8
@@ -4924,9 +4944,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/openai@0.2.1(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))':
+  '@langchain/openai@0.2.1(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))':
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       js-tiktoken: 1.0.12
       openai: 4.52.7
       zod: 3.23.8
@@ -4935,9 +4955,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)':
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
@@ -6429,6 +6449,13 @@ snapshots:
       '@swc/counter': 0.1.3
       tslib: 2.6.3
 
+  '@tanstack/query-core@5.55.4': {}
+
+  '@tanstack/react-query@5.55.4(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-core': 5.55.4
+      react: 18.3.1
+
   '@tanstack/react-table@8.19.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/table-core': 8.19.3
@@ -6695,6 +6722,14 @@ snapshots:
       possible-typed-array-names: 1.0.0
 
   axe-core@4.9.1: {}
+
+  axios@1.7.7:
+    dependencies:
+      follow-redirects: 1.15.6
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
 
   axobject-query@3.1.1:
     dependencies:
@@ -7871,17 +7906,17 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0):
+  langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0):
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
-      '@langchain/openai': 0.2.1(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      '@langchain/openai': 0.2.1(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.36(@langchain/core@0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7))(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      langsmith: 0.1.36(@langchain/core@0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7))(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -7890,6 +7925,7 @@ snapshots:
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
     optionalDependencies:
+      axios: 1.7.7
       handlebars: 4.7.8
       ignore: 5.3.1
       playwright: 1.45.1
@@ -7901,7 +7937,7 @@ snapshots:
 
   langchainhub@0.0.11: {}
 
-  langsmith@0.1.36(@langchain/core@0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7))(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7):
+  langsmith@0.1.36(@langchain/core@0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7))(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -7909,8 +7945,8 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
-      langchain: 0.2.9(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0)
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0))(openai@4.52.7)
+      langchain: 0.2.9(axios@1.7.7)(handlebars@4.7.8)(ignore@5.3.1)(openai@4.52.7)(playwright@1.45.1)(typeorm@0.3.20(pg@8.12.0))(ws@8.18.0)
       openai: 4.52.7
 
   language-subtag-registry@0.3.23: {}
@@ -8430,6 +8466,8 @@ snapshots:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       react-is: 16.13.1
+
+  proxy-from-env@1.1.0: {}
 
   punycode@2.3.1: {}
 

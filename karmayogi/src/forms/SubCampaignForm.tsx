@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer,useState } from "react";
 import {
   Card,
   CardHeader,
@@ -15,16 +15,65 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useFetchSubFormData } from "./Formhook";
-
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-  } from "@/components/ui/command";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
+// Define the form state and action types for useReducer
+interface State {
+  campaignName: string;
+  message: string;
+  valueNumberOrEmail: string;
+  valueBucket: string;
+  valueTemplate: string;
+  date: string;
+  time: string;
+}
+
+type Action =
+  | { type: "SET_CAMPAIGN_NAME"; payload: string }
+  | { type: "SET_MESSAGE"; payload: string }
+  | { type: "SET_VALUE_NUMBER_OR_EMAIL"; payload: string }
+  | { type: "SET_VALUE_BUCKET"; payload: string }
+  | { type: "SET_VALUE_TEMPLATE"; payload: string }
+  | { type: "SET_DATE"; payload: string }
+  | { type: "SET_TIME"; payload: string };
+
+const initialState: State = {
+  campaignName: "",
+  message: "",
+  valueNumberOrEmail: "",
+  valueBucket: "",
+  valueTemplate: "",
+  date: "",
+  time: "",
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "SET_CAMPAIGN_NAME":
+      return { ...state, campaignName: action.payload };
+    case "SET_MESSAGE":
+      return { ...state, message: action.payload };
+    case "SET_VALUE_NUMBER_OR_EMAIL":
+      return { ...state, valueNumberOrEmail: action.payload };
+    case "SET_VALUE_BUCKET":
+      return { ...state, valueBucket: action.payload };
+    case "SET_VALUE_TEMPLATE":
+      return { ...state, valueTemplate: action.payload };
+    case "SET_DATE":
+      return { ...state, date: action.payload };
+    case "SET_TIME":
+      return { ...state, time: action.payload };
+    default:
+      return state;
+  }
+}
 
 interface CampaignFormProps {
   campaignId: string;
@@ -42,36 +91,32 @@ export default function SubCampaignForm({
   const [openNumberOrEmail, setOpenNumberOrEmail] = useState(false);
   const [openBucket, setOpenBucket] = useState(false);
   const [openTemplate, setOpenTemplate] = useState(false);
-  const [date, setDate] = useState<string>("");
-  const [time, setTime] = useState<string>("");
-  const [valueNumberOrEmail, setValueNumberOrEmail] = useState<string>("");
-  const [valueBucket, setValueBucket] = useState<string>("");
-  const [valueTemplate, setValueTemplate] = useState<string>("");
-  const [campaignName, setCampaignName] = useState("");
-  const [message, setMessage] = useState("");
 
   const { templates, buckets } = useFetchSubFormData(campaignType);
 
   const router = useRouter();
+  
+  // Use useReducer instead of multiple useState calls
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const handleSubmit = async () => {
     try {
       const payload: Record<string, any> = {
-        campaignName,
-        template: valueTemplate,
-        bucket: valueBucket,
-        scheduled: date,
-        time,
-        message,
+        campaignName: state.campaignName,
+        template: state.valueTemplate,
+        bucket: state.valueBucket,
+        scheduled: state.date,
+        time: state.time,
+        message: state.message,
       };
-  
+
       // Conditionally add either email or number based on campaignType
       if (campaignType === "email") {
-        payload.email = valueNumberOrEmail;
+        payload.email = state.valueNumberOrEmail;
       } else {
-        payload.number = valueNumberOrEmail;
+        payload.number = state.valueNumberOrEmail;
       }
-  
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns/${campaignId}/create/${campaignType}camp`,
         {
@@ -80,15 +125,16 @@ export default function SubCampaignForm({
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
+          credentials: "include", // This ensures that cookies are included in the request
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       const result = await response.json();
-  
+
       if (result) {
         const { pathname } = window.location;
         router.push(pathname);
@@ -97,7 +143,7 @@ export default function SubCampaignForm({
       console.log(error);
     }
   };
-  
+
   // Determine options based on campaign type
   const numberOrEmailOptions =
     campaignType === "email" ? emails : numbers;
@@ -118,8 +164,10 @@ export default function SubCampaignForm({
           type="text"
           className="p-3 border rounded-md"
           placeholder="Campaign Name"
-          value={campaignName}
-          onChange={(e) => setCampaignName(e.target.value)}
+          value={state.campaignName}
+          onChange={(e) =>
+            dispatch({ type: "SET_CAMPAIGN_NAME", payload: e.target.value })
+          }
         />
 
         {/* Message Textarea */}
@@ -127,12 +175,14 @@ export default function SubCampaignForm({
           maxLength={120}
           className="min-h-[180px] p-3 border rounded-md"
           placeholder="Write your message here..."
-          value={message}
+          value={state.message}
           onChange={(e) => {
-            setMessage(e.target.value);
-            if (e.target.value) setValueTemplate("");
+            dispatch({ type: "SET_MESSAGE", payload: e.target.value });
+            if (e.target.value) {
+              dispatch({ type: "SET_VALUE_TEMPLATE", payload: "" });
+            }
           }}
-          disabled={!!valueTemplate}
+          disabled={!!state.valueTemplate}
         />
 
         <div className="flex items-center justify-center my-2">
@@ -149,11 +199,10 @@ export default function SubCampaignForm({
               role="combobox"
               aria-expanded={openTemplate}
               className="w-full justify-between border rounded-md"
-              disabled={!!message}
+              disabled={!!state.message}
             >
-              {valueTemplate
-                ? templates.find((template) => template.name === valueTemplate)
-                    ?.name
+              {state.valueTemplate
+                ? templates.find((template) => template.name === state.valueTemplate)?.name
                 : "Select Template..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -169,17 +218,15 @@ export default function SubCampaignForm({
                       key={template.name}
                       value={template.name}
                       onSelect={(currentValue) => {
-                        setValueTemplate(currentValue);
-                        setMessage("");
+                        dispatch({ type: "SET_VALUE_TEMPLATE", payload: currentValue });
+                        dispatch({ type: "SET_MESSAGE", payload: "" });
                         setOpenTemplate(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          valueTemplate === template.name
-                            ? "opacity-100"
-                            : "opacity-0"
+                          state.valueTemplate === template.name ? "opacity-100" : "opacity-0"
                         )}
                       />
                       {template.name}
@@ -200,8 +247,8 @@ export default function SubCampaignForm({
               aria-expanded={openBucket}
               className="w-full justify-between border rounded-md"
             >
-              {valueBucket
-                ? buckets.find((bucket) => bucket === valueBucket)
+              {state.valueBucket
+                ? buckets.find((bucket) => bucket === state.valueBucket)
                 : "Select Bucket..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -217,16 +264,14 @@ export default function SubCampaignForm({
                       key={bucket}
                       value={bucket}
                       onSelect={(currentValue) => {
-                        setValueBucket(
-                          currentValue === valueBucket ? "" : currentValue
-                        );
+                        dispatch({ type: "SET_VALUE_BUCKET", payload: currentValue });
                         setOpenBucket(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          valueBucket === bucket ? "opacity-100" : "opacity-0"
+                          state.valueBucket === bucket ? "opacity-100" : "opacity-0"
                         )}
                       />
                       {bucket}
@@ -238,7 +283,7 @@ export default function SubCampaignForm({
           </PopoverContent>
         </Popover>
 
-        {/* Number or Email Selection */}
+        {/* Email/Phone Number Selection */}
         <Popover open={openNumberOrEmail} onOpenChange={setOpenNumberOrEmail}>
           <PopoverTrigger asChild>
             <Button
@@ -247,22 +292,18 @@ export default function SubCampaignForm({
               aria-expanded={openNumberOrEmail}
               className="w-full justify-between border rounded-md"
             >
-              {valueNumberOrEmail
+              {state.valueNumberOrEmail
                 ? numberOrEmailOptions.find(
-                    (option) => option.value === valueNumberOrEmail
+                    (option) => option.value === state.valueNumberOrEmail
                   )?.label
-                : `Select ${campaignType === "email" ? "Email" : "Number"}...`}
+                : `Select ${campaignType === "email" ? "Email" : "Phone Number"}...`}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
             <Command>
-              <CommandInput
-                placeholder={`Search ${
-                  campaignType === "email" ? "email" : "number"
-                }...`}
-              />
-              <CommandEmpty>No options found.</CommandEmpty>
+              <CommandInput placeholder={`Search ${campaignType === "email" ? "email" : "number"}...`} />
+              <CommandEmpty>No {campaignType === "email" ? "email" : "number"} found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
                   {numberOrEmailOptions.map((option) => (
@@ -270,20 +311,14 @@ export default function SubCampaignForm({
                       key={option.value}
                       value={option.value}
                       onSelect={(currentValue) => {
-                        setValueNumberOrEmail(
-                          currentValue === valueNumberOrEmail
-                            ? ""
-                            : currentValue
-                        );
+                        dispatch({ type: "SET_VALUE_NUMBER_OR_EMAIL", payload: currentValue });
                         setOpenNumberOrEmail(false);
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          valueNumberOrEmail === option.value
-                            ? "opacity-100"
-                            : "opacity-0"
+                          state.valueNumberOrEmail === option.value ? "opacity-100" : "opacity-0"
                         )}
                       />
                       {option.label}
@@ -295,25 +330,23 @@ export default function SubCampaignForm({
           </PopoverContent>
         </Popover>
 
-        {/* Date & Time Inputs */}
+        {/* Date and Time Inputs */}
         <Input
           type="date"
           className="p-3 border rounded-md"
-          placeholder="Schedule Date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={state.date}
+          onChange={(e) => dispatch({ type: "SET_DATE", payload: e.target.value })}
         />
         <Input
           type="time"
           className="p-3 border rounded-md"
-          placeholder="Schedule Time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
+          value={state.time}
+          onChange={(e) => dispatch({ type: "SET_TIME", payload: e.target.value })}
         />
       </CardContent>
-      <CardFooter className="flex justify-center p-4">
-        <Button onClick={handleSubmit} className="px-6 py-2">
-          Create Campaign
+      <CardFooter>
+        <Button onClick={handleSubmit} className="w-full">
+          Submit
         </Button>
       </CardFooter>
     </Card>
