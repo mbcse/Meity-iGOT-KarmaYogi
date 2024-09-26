@@ -3,7 +3,7 @@ services:
     image: redis:latest
     container_name: services-queue
     ports:
-      - "6003:6379"
+      - "4003:6379"
   mock-db:
     image: postgres:latest
     container_name: mock-test-services
@@ -12,4 +12,4 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "6001:5432"
+      - "4001:5432"
