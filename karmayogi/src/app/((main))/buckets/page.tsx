@@ -12,7 +12,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/hooks/use-toast";
 import { submitUserInput, saveBucket, showViewBucket, fetchBuckets } from '@/services/bucket/api';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

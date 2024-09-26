@@ -9,7 +9,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/components/hooks/use-toast";
+
+export interface IAccount {
+  _id: string;
+  email: string;
+  smtpPort: string | number;
+  smtpURI: string;
+  imapPort: string | number;
+  imapURI: string;
+  lastSyncedAt?: Date;
+  lastSeenUID?: number;
+}
 
 export default function SettingsPage() {
   const [email, setEmail] = useState("");
@@ -17,9 +30,45 @@ export default function SettingsPage() {
   const [imapURI, setImapURI] = useState("");
   const [imapPort, setImapPort] = useState("");
   const [smtpURI, setSmtpURI] = useState("");
-  const [smtpHost, setSmtpHost] = useState("");
+  const [smtpPort, setSmtpPort] = useState("");
+  const [connectedAccounts, setConnectedAccounts] = useState<IAccount[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchConnectedAccounts();
+  }, []);
+
+  const fetchConnectedAccounts = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/setup/accounts`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setConnectedAccounts(data);
+      } else {
+        setError("Failed to fetch connected accounts");
+        toast({
+          title: "Error",
+          description: "Failed to fetch connected accounts",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("An error occurred while fetching accounts. Please try again.");
+      toast({
+        title: "Error",
+        description: "An error occurred while fetching accounts",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSave = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/setup/account`, {
         method: "POST",
@@ -32,24 +81,49 @@ export default function SettingsPage() {
           imapURI,
           imapPort,
           smtpURI,
-          smtpHost,
+          smtpPort,
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        alert("Email account setup successfully");
+        toast({
+          title: "Success",
+          description: "Email account setup successfully",
+        });
+        fetchConnectedAccounts(); // Refresh the list of connected accounts
+        // Reset form fields
+        setEmail("");
+        setPassword("");
+        setImapURI("");
+        setImapPort("");
+        setSmtpURI("");
+        setSmtpPort("");
       } else {
-        alert("Failed to setup email account");
+        setError(data.error || "Failed to setup email account");
+        toast({
+          title: "Error",
+          description: data.error || "Failed to setup email account",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+      setError("An unexpected error occurred. Please try again.");
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div id="llms">
-      <Card x-chunk="dashboard-04-chunk-4">
+    <div id="emails">
+      <Card>
         <CardHeader>
           <CardTitle>Email Account Setup</CardTitle>
           <CardDescription>
@@ -91,18 +165,46 @@ export default function SettingsPage() {
                 required
               />
               <Input
-                placeholder="SMTP Host"
-                value={smtpHost}
-                onChange={(e) => setSmtpHost(e.target.value)}
+                placeholder="SMTP Port"
+                value={smtpPort}
+                onChange={(e) => setSmtpPort(e.target.value)}
                 required
               />
             </div>
           </form>
         </CardContent>
         <CardFooter className="border-t px-6 py-4">
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </Button>
         </CardFooter>
       </Card>
+
+      <div className="mt-6">
+        <h4 className="text-lg font-semibold mb-4">Connected Accounts</h4>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>IMAP URI</TableHead>
+              <TableHead>IMAP Port</TableHead>
+              <TableHead>SMTP URI</TableHead>
+              <TableHead>SMTP Port</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {connectedAccounts.map((account: IAccount) => (
+              <TableRow key={account._id}>
+                <TableCell>{account.email}</TableCell>
+                <TableCell>{account.imapURI}</TableCell>
+                <TableCell>{account.imapPort}</TableCell>
+                <TableCell>{account.smtpURI}</TableCell>
+                <TableCell>{account.smtpPort}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

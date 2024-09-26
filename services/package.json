@@ -8,6 +8,10 @@
     "server:prod": "NODE_ENV=prod ts-node-dev --respawn --transpile-only ./src/server.ts",    
     "worker:email:dev": "NODE_ENV=dev ts-node-dev -r dotenv/config src/workers/emailWorker.ts",
     "worker:email:prod": "NODE_ENV=prod ts-node-dev -r dotenv/config src/workers/emailWorker.ts",
+    "migrate:postgres:dev": "dotenv -e .env.dev -- pnpx prisma migrate deploy",
+    "studio:postgres:dev": "dotenv -e .env.dev -- pnpx prisma studio",
+    "migrate:postgres:prod": "dotenv -e .env.prod -- pnpx prisma migrate deploy",
+    "studio:postgres:prod": "dotenv -e .env.prod -- pnpx prisma studio",
     "test": "jest /services/tests",
     "build": "tsc",
     "start": "node dist/server.js"

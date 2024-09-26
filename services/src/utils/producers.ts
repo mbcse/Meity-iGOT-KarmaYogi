@@ -24,6 +24,7 @@ export interface I_EmailQueue {
     template: string;
     scheduledAt: Date; // Add scheduled date and time
     senderEmail:string;
+    subjectLine:string;
 }
 
 export interface I_EmailQueue_NC {
@@ -54,7 +55,8 @@ async function addItemsToQueue(
     sub_campaign_id: string,
     template: string,
     scheduledAt: Date,
-    sender:string
+    sender:string,
+    subjectLine?: string
 ) {
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
 
@@ -89,8 +91,11 @@ async function addItemsToQueue(
                 item,
                 template,
                 scheduledAt: scheduledDateIST.toISOString(), // Keep this in ISO format
-                sender
+                sender,
+                subjectLine
             };
+
+            console.log("JOBDATA producer.ts : ",jobData);
             const result = await queue.add(sub_campaign_id, jobData, { delay:delayUTC });
             results.push(result);
         } catch (error) {
@@ -104,8 +109,8 @@ async function addItemsToQueue(
 
 
 
-export async function addEmailToQueue({ emailList, sub_campaign_id, template, scheduledAt,senderEmail }: I_EmailQueue) {
-    return await addItemsToQueue(EmailQueue, emailList, sub_campaign_id, template, scheduledAt,senderEmail);
+export async function addEmailToQueue({ emailList, sub_campaign_id, template, scheduledAt,senderEmail,subjectLine }: I_EmailQueue) {
+    return await addItemsToQueue(EmailQueue, emailList, sub_campaign_id, template, scheduledAt,senderEmail,subjectLine);
 }
 
 export async function addSMSToQueue({ numberList, sub_campaign_id, template, scheduledAt,sender }: I_SMSQueue) {
