@@ -133,7 +133,8 @@ model Template {
   id            String         @id @default(cuid())
   name          String
   type          CampaignType[]
-  body          String  // URL to file
+  body          String // URL to file
   createdAt     DateTime
   updatedAt     DateTime
+  noCode        Boolean @default(false)
 }
