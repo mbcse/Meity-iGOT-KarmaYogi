@@ -129,3 +129,12 @@ BRANCH : feature/005/llmsql
 ## TODO
 
 - Make a way to connect filestorage for caching values (Maybe URI)
+
+
+## [pre-dev-0.0.9] - 2024-07-24
+
+### Added
+
+- Added Charts for email camapaign comparision , no of visitors - communication wise, overall devices chart
+- Created overall pie component 
+- Create device chart for email campaign specifically

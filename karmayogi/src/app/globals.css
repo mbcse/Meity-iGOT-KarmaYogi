@@ -94,3 +94,25 @@
     }
   }
   
+
+  @layer utilities {
+    .scrollbar::-webkit-scrollbar {
+      width: 20px;
+      height: 20px;
+    }
+  
+    .scrollbar::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: #e8e8e8;
+    }
+  
+    .scrollbar::-webkit-scrollbar-thumb {
+      background: #2d2d2d;
+      border-radius: 100vh;
+      border: 3px solid #e8e8e8;
+    }
+  
+    .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #2d2d2d;
+    }
+  }
