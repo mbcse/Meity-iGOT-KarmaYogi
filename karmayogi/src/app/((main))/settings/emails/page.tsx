@@ -21,7 +21,7 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_URL}/setup/account`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_BE_HOST}/setup/account`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

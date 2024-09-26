@@ -19,7 +19,7 @@ const handleCreateClick = () => {
 
   useEffect(() => {
     const fetchCampaigns = async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/campaigns`, { cache: 'no-store' });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/campaigns`, { cache: 'no-store' });
       const data = await response.json();
       setCampaigns(data);
     };

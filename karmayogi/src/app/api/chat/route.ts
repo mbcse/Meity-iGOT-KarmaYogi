@@ -6,23 +6,6 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 
-// Setup Winston logger
-const logDir = 'logs';
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-}
-
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-    ),
-    transports: [
-        new winston.transports.File({ filename: path.join(logDir, 'combined.log') }),
-        new winston.transports.File({ filename: path.join(logDir, 'error.log'), level: 'error' }),
-    ],
-});
 
 export async function GET(req:NextRequest,res: NextResponse) {
     try {
@@ -36,8 +19,6 @@ export async function POST(req: NextRequest) {
     try {
         const { userinput } = await req.json();
 
-        // Log user input
-        logger.info({ userinput });
 
         // Check for blocked phrases
         const blockedPhrases = ["delete the table", "update the table", "change username"];
@@ -46,7 +27,6 @@ export async function POST(req: NextRequest) {
         );
 
         if (containsBlockedPhrase) {
-            logger.error({ message: "Blocked phrase detected", userinput });
             return NextResponse.json({ error: "Blocked phrase detected" }, { status: 400 });
         }
 
@@ -79,8 +59,6 @@ const prompt = `Convert {userinput} to a SINGLE LINE raw SQL query, no comments,
 
         const response = await chain.invoke({ userinput });
 
-        // Log the model output
-        logger.info({ userinput, response });
 
         // Check for blocked SQL commands
         const blockedCommands = ["UPDATE", "DROP", "DELETE"];
@@ -89,7 +67,6 @@ const prompt = `Convert {userinput} to a SINGLE LINE raw SQL query, no comments,
         );
 
         if (containsBlockedCommand) {
-            logger.error({ message: "Blocked SQL command detected", userinput, response });
             return NextResponse.json({ error: "Blocked SQL command detected" }, { status: 400 });
         }
 
@@ -107,11 +84,6 @@ const prompt = `Convert {userinput} to a SINGLE LINE raw SQL query, no comments,
         const tableDataJson = await tableData.json();
         return NextResponse.json({tableData:tableDataJson,sqlQuery:data.sqlQuery});
     } catch (error) {
-        if (error instanceof Error) {
-            logger.error({ message: error.message, stack: error.stack });
-        } else {
-            logger.error({ message: "Unknown error", error });
-        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

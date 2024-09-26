@@ -338,13 +338,11 @@ campaignRouter.post(
       return res.status(400).json({ error: "Email field is required" });
     }
 
-    const dateTimeString = `${scheduled}T${time}:00Z`; // Add seconds and time zone if needed
+    const dateTimeString = `${scheduled}T${time}:00Z`;
 
-    // Parse the combined string into a Date object
     const validDate = new Date(dateTimeString);
     console.log("Valid date:", validDate);
 
-    // Check if the date is valid
     if (isNaN(validDate.getTime())) {
       return res.status(400).json({ message: "Invalid date or time" });
     }
@@ -446,18 +444,19 @@ campaignRouter.post(
           return res.status(400).json({ error: "Invalid campaign type" });
       }
 
-      if (!campaignData) {
-        return res.status(400).json({ error: "Error in creating campaign" });
+      if (!res.headersSent) {
+        console.log(`${campaignType} campaign created:`, campaignData);
+        return res.status(200).json(campaignData);
       }
-
-      console.log(`${campaignType} campaign created:`, campaignData);
-      return res.status(200).json(campaignData);
     } catch (error) {
       console.error(`Failed to create ${campaignType} campaign:`, error);
-      return res.status(500).json({ error: `Failed to create ${campaignType} campaign` });
+      if (!res.headersSent) {
+        return res.status(500).json({ error: `Failed to create ${campaignType} campaign` });
+      }
     }
   }
 );
+
 
 
 

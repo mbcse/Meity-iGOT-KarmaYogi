@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "server:dev": "NODE_ENV=dev ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "server:prod": "NODE_ENV=prod ts-node-dev --respawn --transpile-only ./src/server.ts",    
+    "worker:email:dev": "NODE_ENV=dev ts-node-dev -r dotenv/config src/workers/emailWorker.ts",
     "test": "jest /services/tests",
     "build": "tsc",
     "start": "node dist/server.js"
@@ -31,6 +33,7 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "dotenv-cli": "^7.4.2",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "kysely": "^0.27.4",

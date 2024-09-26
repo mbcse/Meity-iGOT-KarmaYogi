@@ -17,7 +17,7 @@ export function useFetchSubFormData(templateType: string) {
     const fetchTemplates = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_EXPRESS_SERVER_URL}/templates/list/${templateType}`
+          `${process.env.NEXT_PUBLIC_SERVICES_BE_HOST}/templates/list/${templateType}`
         );
         const data = await response.json();
         setTemplates(data);

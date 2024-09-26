@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import { redisHost, redisPort } from "../config";
 
 // Interface for Email content structure
 export interface IRedisEmailValues {
@@ -12,8 +13,8 @@ export async function getEmailCache(cacheKey: string): Promise<IRedisEmailValues
 
   const client = createClient({
     socket: {
-      host: 'localhost',
-      port: 4003
+      host: redisHost,
+      port: parseInt(redisPort,10)
     }    
   });
 
@@ -54,8 +55,8 @@ export async function setEmailCache(campaign_id: string, value: IRedisEmailValue
  
   const client = createClient({
     socket: {
-      host: 'localhost',
-      port: 4003
+      host: redisHost,
+      port: parseInt(redisPort,10)
     }    
   });
   console.log("Cache set Client : ",client);
@@ -97,8 +98,8 @@ export interface ISmsCacheValues {
 export async function getSmsCache(cacheKey: string): Promise<ISmsCacheValues | null> {
   const client = createClient({
     socket: {
-      host: 'localhost',
-      port: 4003
+      host: redisHost,
+      port: parseInt(redisPort,10)
     }    
   });
 
@@ -130,8 +131,8 @@ export async function setSmsCache(campaign_id: string, value: ISmsCacheValues) {
     
   const client = createClient({
     socket: {
-      host: 'localhost',
-      port: 4003
+      host: redisHost,
+      port: parseInt(redisPort,10)
     }    
   });
 
@@ -168,7 +169,10 @@ export interface IWhatsappMessage {
 
 export async function getWhatsappCache(cacheKey: string): Promise<IWhatsappMessage | null> {
   const client = createClient({
-    url: process.env.REDIS_URL,
+    socket: {
+      host: redisHost,
+      port: parseInt(redisPort,10)
+    }    
   });
 
   client.on("connect", () => {
@@ -193,7 +197,10 @@ export async function getWhatsappCache(cacheKey: string): Promise<IWhatsappMessa
 
 export async function setWhatsappCache(campaign_id: string, value: IWhatsappMessage) {
   const client = createClient({
-    url: process.env.REDIS_URL,
+    socket: {
+      host: redisHost,
+      port: parseInt(redisPort,10)
+    }    
   });
 
   client.on("connect", () => {
