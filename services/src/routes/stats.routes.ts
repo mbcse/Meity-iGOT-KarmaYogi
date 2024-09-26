@@ -103,23 +103,6 @@ statsRouter.get("/:campaignID/devices", async (req: Request, res: Response) => {
             totalDesktop+=noOfDesktop;
         })
 
-        smsCampaigns.map((smsCampaigns)=>{
-            const noOfMobile = smsCampaigns.mobile;
-            const noOfDesktop = smsCampaigns.desktop;
-
-            totalMobile+=noOfMobile;
-            totalDesktop+=noOfDesktop;
-        
-        })
-
-        whatsappCampaigns.map((whatsappCampaigns)=>{
-            const noOfMobile = whatsappCampaigns.mobile;
-            const noOfDesktop = whatsappCampaigns.desktop;
-           
-            totalMobile+=noOfMobile;
-            totalDesktop+=noOfDesktop;
-        })
-
         res.json({ stat : {
             mobile:totalMobile,
             desktop:totalDesktop
