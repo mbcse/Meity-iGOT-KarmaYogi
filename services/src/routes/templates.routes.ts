@@ -3,6 +3,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { uploadFile,downloadFile } from '../utils/s3.utils';
 import 'dotenv/config';
+import fs from 'fs';
+
 const prisma = new PrismaClient();
 const templateRouter = express.Router();
 
@@ -87,6 +89,37 @@ templateRouter.post('/upload/nocode'
   }
 })
 
+
+templateRouter.put('/update/nocode', async (req: Request, res: Response) => {
+  try {
+    const { plainJSON, templateName } = req.body;
+
+    const templateName_final = `${templateName}.json`; 
+    // Update the template record in the database with the file path
+    const updatedTemplate = await prisma.template.update({
+      where: {
+      name: templateName,
+      },
+      data: {
+      updatedAt: new Date(),
+      },
+    });
+
+    // Update the file in S3 by replacing the existing one with the new content
+    const result = await uploadFile(
+      Buffer.from(plainJSON),
+      templateName_final,
+      process.env.AWS_TEMP_BUCKET as string
+    );
+
+    return res.json({ result: result, updatedTemplate });
+  } catch (error) {
+    console.error('Error updating template:', error);
+    res.status(500).json({ error: 'An error occurred while updating the template' });
+  }
+});
+
+
 templateRouter.get('/download/nocode/:templateName', async (req: Request, res: Response) => {
   try {
     const {templateName} = req.params;
@@ -109,6 +142,7 @@ templateRouter.get('/list/nocode', async (req: Request, res: Response) => {
         }
     });
 
+    console.log(templates);
     return res.json(templates);
   } catch (error) {
     console.error(error);

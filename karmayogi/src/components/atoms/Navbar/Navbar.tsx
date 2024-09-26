@@ -7,6 +7,10 @@ import React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 
+const LINKS = {
+  TEMPLATES: 'http://localhost:5173/email-builder-js/'
+};
+
 export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
@@ -14,6 +18,7 @@ export default function Navbar() {
   const sections = [
     { name: 'Home', link: '/' },
     { name: 'Buckets', link: '/buckets' },
+    { name: 'Templates', link: LINKS.TEMPLATES },
     { name: 'Campaigns', link: '/campaigns' },
     { name: 'Reports', link: '/reports' }
   ]
@@ -36,7 +41,7 @@ export default function Navbar() {
 
         <div className='flex gap-2 items-center'>
           {sections.map((section, index) => (
-            <Link key={index} href={`${section.link}`}>
+            <Link key={index} href={section.link} target={section.name === 'Templates' ? '_blank' : '_self'}>
               <Button 
                 className={`text-white ${pathname === section.link ? 'font-bold' : ''}`} 
                 variant='link'
