@@ -8,6 +8,7 @@ import bucketsRouter from './routes/buckets.routes';
 import pixelRouter from './routes/pixel.routes';
 import statsRouter from './routes/stats.routes';
 import campaignRouter from './routes/campaign.routes';
+import templateRouter from './routes/templates.routes';
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use('/buckets', bucketsRouter);
 app.use('/pixels',pixelRouter);
 app.use('/stats',statsRouter);
 app.use('/campaigns',campaignRouter);
-
+app.use('/templates',templateRouter);
 app.get('/health', (req, res) => {
   res.json('healthy');
 });

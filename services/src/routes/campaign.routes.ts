@@ -54,6 +54,19 @@ campaignRouter.get('/subcampaigns/:campaignID', async (req: Request, res: Respon
 campaignRouter.post('/create', async (req: Request, res: Response) => {
   try {
     const { campaignName } = req.body;
+    if(campaignName==null || campaignName==""){
+      return res.status(400).json({ error: 'Campaign name cannot be empty' });
+    }
+
+    const existingCampaign = await prisma.campaign.findFirst({
+      where:{
+        campaignName:campaignName
+      }
+    });  
+
+    if(existingCampaign){
+      return res.status(400).json({ error: 'Campaign name already exists' });
+    }
 
     const newCampaign = await prisma.campaign.create({
       data: {
@@ -197,18 +210,29 @@ campaignRouter.patch('/:campaignID/update/name', async (req: Request, res: Respo
 // Create Email Campaign
 campaignRouter.post('/:campaignID/create/emailcamp', async (req: Request, res: Response) => {
   const { campaignID } = req.params;
-  const { subject, fromMail, mailbody, scheduled } = req.body;
+  const { email, template, scheduled, campaignName, bucket } = req.body;
 
   try {
+    const bucketChangedName = await checkAndUpdateBucket(bucket) as string;
+
     const emailCampaign = await prisma.emailCampaign.create({
       data: {
-        campaignID,
-        subject,
-        fromMail,
-        mailbody,
-        scheduled: new Date(scheduled),
+        campaign:{
+          connect:{
+            id:campaignID
+          }
+        },
+        campaignTitle: campaignName,
+        fromMail: email,
+        mailbody: template,
+        scheduled: scheduled,
         status: 'PENDING',
         regionsClicks: [],
+        bucket: {
+          connect: {
+            changedName: bucketChangedName,
+          },
+        },
       },
     });
 
@@ -221,17 +245,29 @@ campaignRouter.post('/:campaignID/create/emailcamp', async (req: Request, res: R
 // Create SMS Campaign
 campaignRouter.post('/:campaignID/create/smscamp', async (req: Request, res: Response) => {
   const { campaignID } = req.params;
-  const { Number, SMSBody, scheduled } = req.body;
+  const { number, template, scheduled, campaignName, bucket } = req.body;
 
   try {
+    const bucketChangedName = await checkAndUpdateBucket(bucket) as string;
+
     const smsCampaign = await prisma.sMSCampaign.create({
       data: {
-        campaignID,
-        Number:Number,
-        SMSBody,
-        scheduled: new Date(scheduled),
+        campaign:{
+          connect:{
+            id:campaignID
+          }
+        },
+        campaignTitle: campaignName,
+        Number: number,
+        SMSBody: template,
+        scheduled: scheduled,
         status: 'PENDING',
         regionsClicks: [],
+        bucket: {
+          connect: {
+            changedName: bucketChangedName,
+          },
+        },
       },
     });
 
@@ -241,28 +277,71 @@ campaignRouter.post('/:campaignID/create/smscamp', async (req: Request, res: Res
   }
 });
 
+
+async function checkAndUpdateBucket(bucket:string) {
+  try {
+    const _bucket = await prisma.buckets.findFirst({
+      where:{
+        name:bucket
+      }
+    });
+
+    if(_bucket){
+      return _bucket.changedName;
+    }
+
+    const newBucket = await prisma.buckets.create({
+      data: {
+        name: bucket,
+        changedName: bucket,
+        query:"",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    return newBucket.changedName;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // Create WhatsApp Campaign
 campaignRouter.post('/:campaignID/create/whatsappcamp', async (req: Request, res: Response) => {
   const { campaignID } = req.params;
-  const { Number, textbody, scheduled } = req.body;
+  const { number, template, scheduled, campaignName, bucket } = req.body;
 
   try {
+    const bucketChangedName = await checkAndUpdateBucket(bucket) as string;
+
     const whatsappCampaign = await prisma.whatsAppCampaign.create({
       data: {
-        campaignID,
-        Number:Number,
-        textbody,
-        scheduled: new Date(scheduled),
+        campaign:{
+          connect:{
+            id:campaignID
+          }
+        },
+        campaignTitle: campaignName,
+        Number: number,
+        textbody: template,
+        scheduled: scheduled,
         status: 'PENDING',
         regionsClicks: [],
+        bucket: {
+          connect: {
+            changedName: bucketChangedName,
+          },
+        },
       },
     });
 
     res.status(201).json(whatsappCampaign);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Failed to create WhatsApp campaign' });
   }
-});  
+});
+
 
 
 export default campaignRouter;

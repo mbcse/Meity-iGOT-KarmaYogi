@@ -1,14 +1,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight, Users } from 'lucide-react';
-
+import Link from 'next/link';
 
 interface ICampSliderProps {
     campaignType: 'WA' | 'EMAIL' | 'SMS';
     campaignCards: any[];
+    campaignId : string;
 }
 
-export default function CampSlider({ campaignType, campaignCards }: ICampSliderProps) {
+export default function CampSlider({ campaignId, campaignCards }: ICampSliderProps) {
     console.log(campaignCards);
     const title = {
         WA: "Whatsapp Campaigns",
@@ -36,9 +37,11 @@ export default function CampSlider({ campaignType, campaignCards }: ICampSliderP
                                     <Users />
                                     {campaignCard.targeted}
                                 </div>
+                                    <Link href={`/reports/${campaignId}`}>
                                 <Button className='rounded-full p-2' >
                                     <ArrowUpRight size={16} />                                    
                                 </Button>
+                                    </Link>
                             </div>
                         </div>
                     ))

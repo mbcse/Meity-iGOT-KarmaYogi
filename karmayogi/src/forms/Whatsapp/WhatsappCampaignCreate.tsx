@@ -1,14 +1,7 @@
-import React from 'react'
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import React, { useEffect, useState } from 'react';
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 import { Input } from '@/components/ui/input';
 
 import {
@@ -18,26 +11,30 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
-const templates = [
-  {
-    value: "Diwali",
-    label: "Diwali",
-  }
-]
+import { Check, ChevronsUpDown } from "lucide-react";
 
-const buckets = [
-  {
-    value: "NorthIndianIPS",
-    label: "North Indian IPS",
-  }
-]
+import { cn } from "@/lib/utils";
+
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+
+interface Template {
+  id: string;
+  name: string;
+  body: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const numbers = [
   {
@@ -48,40 +45,116 @@ const numbers = [
     value: "Number2",
     label: "Number 2",
   }
-]
+];
 
-import { Check, ChevronsUpDown } from "lucide-react"
+export default function WhatsappCampaignCreate({ campaignId }: { campaignId: string }) {
+  const [openNumber, setOpenNumber] = useState(false);
+  const [openBucket, setOpenBucket] = useState(false);
+  const [openTemplate, setOpenTemplate] = useState(false);
+  console.log("campaign ID", campaignId);
+  const [date, setDate] = React.useState<Date>();
+  const [valueNumber, setValueNumber] = useState("");
+  const [valueBucket, setValueBucket] = useState("");
+  const [valueTemplate, setValueTemplate] = useState("");
+  const [campaignName, setCampaignName] = useState("");
+  const [message, setMessage] = useState("");
 
-import { cn } from "@/lib/utils"
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [buckets, setBuckets] = useState<string[]>([]);
 
-import { DatePicker } from '@/components/ui/date-picker';
-import { Button } from '@/components/ui/button';
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await fetch(`http://localhost:3010/templates/list/whatsapp`);
+        const data = await response.json();
+        console.log(data);
 
-export default function WhatsappCampaignCreate() {
-  const [openNumber, setOpenNumber] = React.useState(false)
-  const [openBucket, setOpenBucket] = React.useState(false)
-  const [openTemplate, setOpenTemplate] = React.useState(false)
+        setTemplates(data);
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      }
+    };
 
-  const [valueNumber, setValueNumber] = React.useState("")
-  const [valueBucket, setValueBucket] = React.useState("")
-  const [valueTemplate, setValueTemplate] = React.useState("")
-  
+    const fetchBuckets = async () => {
+      try {
+        const response = await fetch(`/api/db/showviewlist`);
+        const data = await response.json();
+        console.log(data);
+
+        setBuckets(data);
+      } catch (error) {
+        console.error('Error fetching buckets:', error);
+      }
+    };
+
+    fetchBuckets();
+    fetchTemplates();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(`http://localhost:3010/campaigns/${campaignId}/create/whatsappcamp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campaignName,
+          message,  
+          template: valueTemplate,
+          bucket: valueBucket,
+          number: valueNumber,
+          scheduled: date?.toISOString(),
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTemplateSelect = (currentValue: any) => {
+    setValueTemplate(currentValue === valueTemplate ? "" : currentValue);
+    setOpenTemplate(false);
+    if (currentValue !== valueTemplate) {
+      setMessage(""); // Clear the message if a template is selected
+    }
+  };
+
+  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+    if (e.target.value) {
+      setValueTemplate(""); // Clear the template if a message is being typed
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Whatsapp Campaign</CardTitle>
-        <CardDescription>Create a new whatsapp campaign</CardDescription>
+        <CardTitle>WhatsApp Campaign</CardTitle>
+        <CardDescription>Create a new WhatsApp campaign</CardDescription>
       </CardHeader>
-      <CardContent className='flex flex-col gap-2 overflow-auto max-h-[320px]'>
+      <CardContent className='flex flex-col gap-4 overflow-auto max-h-[400px] p-4'>
         <Input 
           type="text" 
-          className='text-center  p-3 text-gray-500 font-bold text-xl ' 
+          className='p-3' 
           placeholder='Campaign Name'
+          value={campaignName}
+          onChange={(e) => setCampaignName(e.target.value)}
         />
         <Textarea 
           maxLength={120} 
-          className='min-h-[180px] text-center  p-3 text-gray-500 font-medium text-xl ' 
+          className='min-h-[180px] p-3 text-gray-500 font-medium text-xl' 
           placeholder='Write your message here...'
+          value={message}
+          onChange={handleMessageChange}
+          disabled={!!valueTemplate} // Disable message textarea if a template is selected
         />
 
         <div className='flex items-center gap-2'>
@@ -90,47 +163,41 @@ export default function WhatsappCampaignCreate() {
           <div className='h-[1px] bg-gray-300 min-w-[100px]'></div>
         </div>
 
-        <Popover open={openTemplate} onOpenChange={setOpenTemplate} className='w-full'>
+        <Popover open={openTemplate} onOpenChange={setOpenTemplate}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={openTemplate}
-              className="w-[200px] justify-between"
+              className="w-full justify-between"
+              disabled={!!message} // Disable template selection if a message is being typed
             >
               {valueTemplate
-                ? templates.find((template) => template.value === valueTemplate)?.label
+                ? templates.find((template) => template.name === valueTemplate)?.name
                 : "Select Template..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
+          <PopoverContent className="w-full p-0">
             <Command>
               <CommandInput placeholder="Search template..." />
               <CommandEmpty>No template found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
                   {templates.map((template) => (
-                    <>
-
                     <CommandItem
-                      key={template.value}
-                      value={template.value}
-                      onSelect={(currentValue:any) => {
-                        setValueTemplate(currentValue === valueTemplate ? "" : currentValue)
-                        setOpenTemplate(false)
-                      }}
+                      key={template.name}
+                      value={template.name}
+                      onSelect={handleTemplateSelect}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          valueTemplate === template.value ? "opacity-100" : "opacity-0"
+                          valueTemplate === template.name ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {template.label}
+                      {template.name}
                     </CommandItem>
-                    
-                    </>
                   ))}
                 </CommandGroup>
               </CommandList>
@@ -138,100 +205,119 @@ export default function WhatsappCampaignCreate() {
           </PopoverContent>
         </Popover>
 
-        <div className='flex flex-col'>
-          <Popover open={openBucket} onOpenChange={setOpenBucket}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={openBucket}
-                className="w-[200px] justify-between"
-              >
-                {valueBucket
-                  ? buckets.find((bucket) => bucket.value === valueBucket)?.label
-                  : "Select Bucket..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search Bucket..." />
-                <CommandEmpty>No Bucket found.</CommandEmpty>
-                <CommandList>
-                  <CommandGroup>
-                    {buckets.map((bucket) => (
-                      <CommandItem
-                        key={bucket.value}
-                        value={bucket.value}
-                        onSelect={(currentValue:any) => {
-                          setValueBucket(currentValue === valueBucket ? "" : currentValue)
-                          setOpenBucket(false)
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            valueBucket === bucket.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {bucket.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+        <Popover open={openBucket} onOpenChange={setOpenBucket}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={openBucket}
+              className="w-full justify-between"
+            >
+              {valueBucket
+                ? buckets.find((bucket) => bucket === valueBucket)?.toString()
+                : "Select Bucket..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search Bucket..." />
+              <CommandEmpty>No Bucket found.</CommandEmpty>
+              <CommandList>
+                <CommandGroup>
+                  {buckets.map((bucket) => (
+                    <CommandItem
+                      key={bucket}
+                      value={bucket}
+                      onSelect={(currentValue: any) => {
+                        setValueBucket(currentValue === valueBucket ? "" : currentValue)
+                        setOpenBucket(false)
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          valueBucket === bucket ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {bucket}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
 
-          <Popover open={openNumber} onOpenChange={setOpenNumber}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={openNumber}
-                className="w-[200px] justify-between"
-              >
-                {valueNumber
-                  ? numbers.find((number) => number.value === valueNumber)?.label
-                  : "Select Number..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search Number..." />
-                <CommandEmpty>No Number found.</CommandEmpty>
-                <CommandList>
-                  <CommandGroup>
-                    {numbers.map((number) => (
-                      <CommandItem
-                        key={number.value}
-                        value={number.value}
-                        onSelect={(currentValue:any) => {
-                          setValueNumber(currentValue === valueNumber ? "" : currentValue)
-                          setOpenNumber(false)
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            valueNumber === number.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {number.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+        <Popover open={openNumber} onOpenChange={setOpenNumber}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={openNumber}
+              className="w-full justify-between"
+            >
+              {valueNumber
+                ? numbers.find((number) => number.value === valueNumber)?.label
+                : "Select Number..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search Number..." />
+              <CommandEmpty>No Number found.</CommandEmpty>
+              <CommandList>
+                <CommandGroup>
+                  {numbers.map((number) => (
+                    <CommandItem
+                      key={number.value}
+                      value={number.value}
+                      onSelect={(currentValue: any) => {
+                        setValueNumber(currentValue === valueNumber ? "" : currentValue)
+                        setOpenNumber(false)
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          valueNumber === number.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {number.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
 
-          <DatePicker />
-        </div>
-
-        <Button>Submit</Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+            />
+          </PopoverContent>
+        </Popover>
       </CardContent>
+      <CardFooter>
+        <Button className='bg-green-600 text-white p-2 rounded-md' onClick={handleSubmit}>Submit</Button>
+      </CardFooter>
     </Card>
-  )
+  );
 }

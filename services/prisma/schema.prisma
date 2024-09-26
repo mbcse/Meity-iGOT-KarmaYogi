@@ -14,12 +14,15 @@ model User {
 }
 
 model Buckets {
-  id            Int       @id @default(autoincrement())
+  id            String      @id @default(cuid())
   name          String    
   changedName   String    @unique
   query         String
   createdAt     DateTime
   updatedAt     DateTime
+  whatsappCampaigns WhatsAppCampaign[]
+  smsCampaigns      SMSCampaign[]
+  emailCampaigns    EmailCampaign[]
 }
 
 model Campaign {
@@ -42,6 +45,8 @@ model WhatsAppCampaign {
   campaignID    String
   campaignTitle       String @default("")
   Number    String
+  bucket    Buckets  @relation(fields: [bucketID], references: [id])
+  bucketID  String
   textbody      String // URL to file
   targeted      Int            @default(0)
   bounced       Int            @default(0)
@@ -60,6 +65,8 @@ model SMSCampaign {
   campaignID    String
   campaignTitle       String @default("")
   Number    String
+  bucket    Buckets  @relation(fields: [bucketID], references: [id])
+  bucketID  String 
   SMSBody       String // URL to file
   targeted      Int            @default(0)
   bounced       Int            @default(0)
@@ -79,6 +86,8 @@ model EmailCampaign {
   campaignTitle       String @default("")
   fromMail      String
   mailbody      String // URL to file
+  bucket    Buckets  @relation(fields: [bucketID], references: [id]) 
+  bucketID  String 
   targeted      Int            @default(0)
   bounced       Int            @default(0)
   opened        Int            @default(0)
@@ -118,4 +127,13 @@ enum CampaignStatus {
   SENT
   FAILED
   DRAFT
+}
+
+model Template {
+  id            String         @id @default(cuid())
+  name          String
+  type          CampaignType[]
+  body          String  // URL to file
+  createdAt     DateTime
+  updatedAt     DateTime
 }

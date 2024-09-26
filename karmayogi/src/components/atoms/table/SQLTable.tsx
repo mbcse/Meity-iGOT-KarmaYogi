@@ -12,10 +12,16 @@ import {
 export default function SQLTable({ responseData }: { responseData: any }) {
     const [tableData, setTableData] = useState([]);
     const [tableHeads, setTableHeads] = useState<string[]>([]);
-
+    const [empty,setEmpty] = useState(false);
     useEffect(() => {
         const fitData = async () => {
             try {
+                if(responseData.result.length === 0){
+                    setEmpty(true);
+                }else{
+                    setEmpty(false);
+                }
+
                 if (responseData && responseData.result && responseData.result.length > 0) {
                     setTableHeads(Object.keys(responseData.result[0]));
                     setTableData(responseData.result);
@@ -39,13 +45,13 @@ export default function SQLTable({ responseData }: { responseData: any }) {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {tableData.map((dataLine, index) => (
+                {!empty ? tableData.map((dataLine, index) => (
                     <TableRow key={index}>
                         {Object.values(dataLine).map((data, index) => (
                             <TableCell key={index}>{data as string}</TableCell>
                         ))}
                     </TableRow>
-                ))}
+                )):"No data available"}
             </TableBody>
         </Table>
     );
