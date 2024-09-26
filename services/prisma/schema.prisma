@@ -25,6 +25,15 @@ model Buckets {
   emailCampaigns    EmailCampaign[]
 }
 
+enum CampaignStatus {
+  scheduled
+  running
+  completed
+  cancelled
+  draft
+  failed
+}
+
 model Campaign {
   id               String             @id @default(cuid())
   campaignName     String
@@ -33,7 +42,7 @@ model Campaign {
   noOfSMS          Int                @default(0)
   noOfWhatsApp     Int                @default(0)
   noOfUsers        Int                @default(0)
-  bgImgUrl         String             @default("https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg")
+  status           CampaignStatus     @default(draft)
   campaignType     CampaignType[]
   whatsappCampaign WhatsAppCampaign[]
   smsCampaign      SMSCampaign[]
@@ -52,7 +61,7 @@ model WhatsAppCampaign {
   bounced       Int            @default(0)
   scheduled     DateTime
   timeToBeSent  String         @default("00:00")
-  status        CampaignStatus
+  status        CampaignStatus @default(draft)
   unsubscribed  Int            @default(0)
   regionsClicks String[]
   ctalinks      CTALink[]      @relation("WhatsAppCampaignCTALinks")
@@ -73,7 +82,7 @@ model SMSCampaign {
   bounced       Int            @default(0)
   scheduled     DateTime
   timeToBeSent  String         @default("00:00")
-  status        CampaignStatus
+  status        CampaignStatus @default(draft)
   unsubscribed  Int            @default(0)
   regionsClicks String[]
   ctalinks      CTALink[]      @relation("SMSCampaignCTALinks")
@@ -97,7 +106,7 @@ model EmailCampaign {
   desktop       Int            @default(0)
   scheduled     DateTime
   timeToBeSent  String         @default("00:00")
-  status        CampaignStatus
+  status        CampaignStatus @default(draft)
   unsubscribed  Int            @default(0)
   spamReports   Int            @default(0)
   ctalinks      CTALink[]      @relation("EmailCampaignCTALinks")
@@ -125,11 +134,9 @@ enum CampaignType {
   WHATSAPP
 }
 
-enum CampaignStatus {
+enum QueueStatus {
   PENDING
-  SENT
-  FAILED
-  DRAFT
+  QUEUED
 }
 
 model Template {
@@ -142,31 +149,16 @@ model Template {
   noCode    Boolean        @default(false)
 }
 
-enum QueueStatus {
-  PENDING
-  QUEUED
-}
-
-model Scheduled{
-  id        String         @id @default(cuid())
-  subCampaignID String
-  type     CampaignType[]
-  scheduled DateTime
-  timeToBeSent String
-  status    CampaignStatus
-  createdAt DateTime
-  updatedAt DateTime
-  queueStats QueueStatus
-}
-
-model emailsGiven{
-  id        String         @id @default(cuid())
-  email     String
-}
-
-model numbersGiven{
-  id        String         @id @default(cuid())
-  number    String
+model Scheduled {
+  id             String         @id @default(cuid())
+  subCampaignID  String
+  type           CampaignType[]
+  scheduled      DateTime
+  timeToBeSent   String
+  status         CampaignStatus
+  createdAt      DateTime
+  updatedAt      DateTime
+  queueStats     QueueStatus
 }
 
 
@@ -175,7 +167,6 @@ model Database {
   url    String  @unique
   tables Table[]
 }
-
 
 model Table {
   id          Int       @id @default(autoincrement())
