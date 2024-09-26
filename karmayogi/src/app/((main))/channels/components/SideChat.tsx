@@ -55,7 +55,7 @@ export default function SideChat() {
 
   const fetchLatestThreads = async () => {
     try {
-      const response = await fetch("http://localhost:7000/chat/info@shecodeshacks.com/messagesList");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_CHANNELS_URL}/chat/info@shecodeshacks.com/messagesList`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Users } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
@@ -56,7 +56,6 @@ export default function CampSlider({
               <div className="flex justify-between px-2">
                 <h4
                   className="text-2xl font-medium truncate"
-                  title={campaignCard.campaignTitle}
                 >
                   {campaignCard.campaignTitle}
                 </h4>
@@ -72,10 +71,9 @@ export default function CampSlider({
               <div className="flex justify-between items-center p-2 rounded-md">
                 <div className="flex items-center justify-between w-full">
                   <div>
-                    <div className="flex gap-2 bg-[#5456DB]/70 text-white rounded-full px-4 py-1">
-                     
+                    <div className="flex gap-2 text-white rounded-full px-4 py-1 bg-[#5456DB]/70 overflow-hidden truncate max-w-[150px] whitespace-nowrap">
                       {campaignCard.bucket.name}
-                    </div>  
+                    </div>
                     <div className="flex gap-2 px-2">
                       <span>{newDate(campaignCard.scheduled)}</span>
                       <span>{campaignCard.timeToBeSent}</span>

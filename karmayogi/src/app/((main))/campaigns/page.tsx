@@ -1,4 +1,3 @@
-import CampaignsCardPage from "./CampaignsCardPage"
 import CampaignTablePage from "./CampaignTablePage";
 
 export interface CampCardProps {

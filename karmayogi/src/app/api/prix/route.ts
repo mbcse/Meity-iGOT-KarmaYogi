@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/database/db";
 
 const expectedColumns = [
-  'name', 'email', 'jobTitle', 'gender', 'number',
-  'officeStartTime', 'officeEndTime', 'location', 'birthday'
+  'name', 'email', 'jobtitle', 'gender', 'number',
+  'officestarttime', 'officeendtime', 'location', 'birthday'
 ];
 
 function quoteColumnNames(sql:string) {

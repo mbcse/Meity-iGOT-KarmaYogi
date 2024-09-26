@@ -8,7 +8,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 
 const LINKS = {
-  TEMPLATES: 'http://localhost:5173/email-builder-js/'
+  TEMPLATES: process.env.NEXT_PUBLIC_TEMPLATES_URL as string
 };
 
 export default function Navbar() {
