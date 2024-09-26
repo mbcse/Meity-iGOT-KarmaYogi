@@ -1,10 +1,14 @@
 "use client";
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from 'next/link'
 import React from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { LogOut } from 'lucide-react'
 
 export default function Navbar() {
+  const pathname = usePathname()
   const router = useRouter()
 
   const sections = [
@@ -14,18 +18,49 @@ export default function Navbar() {
     { name: 'Reports', link: '/reports' }
   ]
 
-  return (
-    <div className='flex bg-black text-white p-4 shadow-sm justify-between items-center'>
-      <div>Karmayogi</div>
+  const handleLogout = async () => {
+    // Clear cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
 
-      <div className='flex gap-2'>
-        {sections.map((section, index) => (
-          <Link key={index} href={`${section.link}`}>
-            <Button className='text-white' variant='link'>
-              {section.name}
-            </Button>
-          </Link>
-        ))}
+    router.push('/login');
+  }
+
+  return (
+    <div className='py-2 px-4 '>
+      <div className='flex bg-[#5456DB] px-4 py-2 rounded-md text-white justify-between items-center'>
+        <img src="/Karmayogi.svg" className='w-24' alt="Karmayogi logo" />
+
+        <div className='flex gap-2 items-center'>
+          {sections.map((section, index) => (
+            <Link key={index} href={`${section.link}`}>
+              <Button 
+                className={`text-white ${pathname === section.link ? 'font-bold' : ''}`} 
+                variant='link'
+              >
+                {section.name}
+              </Button>
+            </Link>
+          ))}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   )
