@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.routes';
 import producerRouter from './routes/producer.routes';
+import bucketsRouter from './routes/buckets.routes';
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/producer', producerRouter);
+app.use('/buckets', bucketsRouter);
+
 app.get('/health', (req, res) => {
   res.json('healthy');
 });

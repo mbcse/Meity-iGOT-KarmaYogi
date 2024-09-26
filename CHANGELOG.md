@@ -63,6 +63,8 @@ BRANCH : feature/004/redis-setup
 
 ## [pre-dev-0.0.4] - 2024-07-15
 
+BRANCH : feature/005/llmsql
+
 ### Added
 
 - Added prisma to karmayogi
@@ -72,3 +74,14 @@ BRANCH : feature/004/redis-setup
 - Table component created 
 - DB seeding script written with @fakerjs with en_IN localisation
 - Chatbot have programmatic blockers to prevent execution of commands such as UPDATE,DELETE,DROP
+
+
+## [pre-dev-0.0.5] - 2024-07-16
+
+### Added
+
+- Added api for creating and showing view in /karmayogi nextjs app
+- Added saving bucket api in /services
+- Prisma schema in /Services , added bucket model
+
+

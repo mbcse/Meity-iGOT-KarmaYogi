@@ -18,3 +18,12 @@ model User {
   email     String   @unique
   password  String
 }
+
+model Buckets{
+  id            Int       @id @default(autoincrement())
+  name          String    
+  changedName   String    @unique
+  query         String
+  createdAt     DateTime
+  updatedAt     DateTime
+}
