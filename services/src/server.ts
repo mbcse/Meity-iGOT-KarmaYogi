@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.routes';
 import producerRouter from './routes/producer.routes';
 import bucketsRouter from './routes/buckets.routes';
-
+import pixelRouter from './routes/pixel.routes';
 const app = express();
 
 app.use(express.json());
@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use('/auth', authRouter);
 app.use('/producer', producerRouter);
 app.use('/buckets', bucketsRouter);
-
+app.use('/pixels',pixelRouter)
 app.get('/health', (req, res) => {
   res.json('healthy');
 });

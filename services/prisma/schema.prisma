@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,11 +13,102 @@ model User {
   password  String
 }
 
-model Buckets{
+model Buckets {
   id            Int       @id @default(autoincrement())
   name          String    
   changedName   String    @unique
   query         String
   createdAt     DateTime
   updatedAt     DateTime
+}
+
+model Campaign {
+  id               String             @id @default(cuid())
+  campaignName     String
+  timeCreate       DateTime           @default(now())
+  campaignType     CampaignType[]
+  whatsappCampaign WhatsAppCampaign[]
+  smsCampaign      SMSCampaign[]
+  emailCampaign    EmailCampaign[]
+}
+
+model WhatsAppCampaign {
+  id            String         @id @default(cuid())
+  campaignID    String
+  fromNumber    String
+  textbody      String // URL to file
+  targeted      Int            @default(0)
+  bounced       Int            @default(0)
+  scheduled     DateTime
+  status        CampaignStatus
+  unsubscribed  Int            @default(0)
+  regionsClicks String[]
+  ctalinks      CTALink[]      @relation("WhatsAppCampaignCTALinks")
+  campaign      Campaign       @relation(fields: [campaignID], references: [id])
+
+  @@index([campaignID])
+}
+
+model SMSCampaign {
+  id            String         @id @default(cuid())
+  campaignID    String
+  fromNumber    String
+  SMSBody       String // URL to file
+  targeted      Int            @default(0)
+  bounced       Int            @default(0)
+  scheduled     DateTime
+  status        CampaignStatus
+  unsubscribed  Int            @default(0)
+  regionsClicks String[]
+  ctalinks      CTALink[]      @relation("SMSCampaignCTALinks")
+  campaign      Campaign       @relation(fields: [campaignID], references: [id])
+
+  @@index([campaignID])
+}
+
+model EmailCampaign {
+  id            String         @id @default(cuid())
+  campaignID    String
+  subject       String
+  fromMail      String
+  mailbody      String // URL to file
+  targeted      Int            @default(0)
+  bounced       Int            @default(0)
+  opened        Int            @default(0)
+  mobile        Int            @default(0)
+  desktop       Int            @default(0)
+  scheduled     DateTime
+  status        CampaignStatus
+  unsubscribed  Int            @default(0)
+  spamReports   Int            @default(0)
+  ctalinks      CTALink[]      @relation("EmailCampaignCTALinks")
+  regionsClicks String[]
+  campaign      Campaign       @relation(fields: [campaignID], references: [id])
+
+  @@index([campaignID])
+}
+
+model CTALink {
+  id                 String              @id @default(cuid())
+  url                String
+  clicks             Int                 @default(0)
+  mobile             Int                 @default(0)
+  desktop            Int                 @default(0)
+  regionsClicks      String[]
+  whatsappCampaigns  WhatsAppCampaign[]  @relation("WhatsAppCampaignCTALinks")
+  smsCampaigns       SMSCampaign[]       @relation("SMSCampaignCTALinks")
+  emailCampaigns     EmailCampaign[]     @relation("EmailCampaignCTALinks")
+}
+
+enum CampaignType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum CampaignStatus {
+  PENDING
+  SENT
+  FAILED
+  DRAFT
 }
