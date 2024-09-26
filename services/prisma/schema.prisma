@@ -27,6 +27,7 @@ model Buckets {
 
 enum CampaignStatus {
   scheduled
+  queued
   running
   completed
   cancelled

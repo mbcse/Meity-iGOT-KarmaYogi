@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 import ReportCard, { ReportCardProps } from './ReportCard';
 import { CommType } from '@/states/chat.atom';
 
@@ -22,6 +23,7 @@ async function fetchStats(): Promise<ReportCardProps[]> {
       }
     ];
 
+    console.log(mappedData);
     return mappedData;
   } catch (error) {
     console.error('Failed to fetch stats data:', error);
@@ -29,9 +31,17 @@ async function fetchStats(): Promise<ReportCardProps[]> {
   }
 }
 
-export default async function OverallBar() {
-  // Fetch data on the server
-  const overallStatsData = await fetchStats();
+export default function OverallBar() {
+  const [overallStatsData, setOverallStatsData] = useState<ReportCardProps[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await fetchStats();
+      setOverallStatsData(data);
+    }
+
+    fetchData();
+  }, []); // The empty dependency array means this runs once on mount
 
   return (
     <div className='p-4 flex gap-4 overflow-x-auto'>

@@ -33,8 +33,8 @@ export default function Page() {
       label: "somemail@ok.com",
     },
     {
-      value: "nice@jio.do",
-      label: "nice@jio.do",
+      value: "info@shecodeshacks.com",
+      label: "info@shecodeshacks.com",
     },
   ];
 
