@@ -117,7 +117,7 @@ export default function Page() {
     };
 
     return (
-        <div className="flex flex-1 h-screen overflow-hidden">
+        <div className="flex flex-1 h-full overflow-hidden">
             <aside className="w-64 bg-white border-r p-4 overflow-y-auto">
                 <h2 className="text-xl font-semibold mb-4">Buckets</h2>
                 {buckets.map((bucket, index) => (
