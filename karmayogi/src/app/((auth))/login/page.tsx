@@ -49,7 +49,7 @@ export default function Page() {
   };
 
   return (
-    <div className='p-8 w-full flex items-center justify-center'>
+    <div className='py-8 px-2 bg-[#262626] text-white rounded-r-lg w-full flex items-center justify-center'>
       <div className='flex flex-col gap-3'>
         <h1 className='font-bold text-2xl my-3'>
           Let&apos;s get you started!
@@ -81,17 +81,17 @@ export default function Page() {
             </div>
           </div>
 
-          <Button type="submit" aria-label="login button">
+          <Button type="submit" aria-label="login button" className='bg-[#5456DB]'>
             Login
           </Button>
 
           <div>
-            <div className='italic'>
+            {/* <div className='italic'>
               Forgot your password?
               <Button variant='link' className='text-white hover:text-gray-300' aria-label="forgot password button">
                 Forgot my password
               </Button>
-            </div>
+            </div> */}
 
             <div className='italic'>
               Don&apos;t have an account?
