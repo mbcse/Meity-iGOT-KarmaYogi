@@ -1,5 +1,5 @@
 import { ImapFlow,MailboxLockObject } from 'imapflow';
-import { IEmailAccount } from '../models/email.models';
+import { IEmailAccount } from '../models/EmailAccount';
 
 interface ImapConfig {
     host: string;
@@ -14,7 +14,7 @@ interface ImapConfig {
 function convertToImapConfig(emailAccount: IEmailAccount): ImapConfig {
     return {
         host: emailAccount.imapURI,
-        port: parseInt(emailAccount.imapPort, 10),
+        port: parseInt(emailAccount.imapPort as string, 10),
         secure: true, // Assuming secure connection, modify if needed
         auth: {
             user: emailAccount.email,

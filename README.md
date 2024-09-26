@@ -36,10 +36,11 @@ SPV/MDO will be able to connect with users, understand their issues, nudge them 
 - User feedback indicating satisfaction with communication effectiveness and responsiveness.
 
 ## Implementation Details
--
+  
+
 
 ## Mockups/Wireframes
--
+- 
 
 ## Product Name
 Karmayogi
@@ -57,4 +58,4 @@ Other
 @mbcse
 
 ## Category
-Backend
+Fullstack

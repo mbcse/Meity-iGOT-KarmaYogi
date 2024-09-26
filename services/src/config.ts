@@ -1,7 +1,12 @@
 import dotenv from 'dotenv';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+// Use NODE_ENV directly
+const nodeEnv = process.env.NODE_ENV || 'dev'; // Default to 'dev' if NODE_ENV is not set
 
+// Load environment-specific configuration based on NODE_ENV
+dotenv.config({ path: `.env.${nodeEnv}` });
+
+// Export environment variables
 export const smtpHostUri = process.env.SMTP_HOST_URI;
 export const smtpPort = process.env.SMTP_PORT;
 

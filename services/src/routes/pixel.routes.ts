@@ -26,8 +26,8 @@ pixelRouter.get("/email/:id", async (req: Request, res: Response) => {
     let deviceType = 'desktop'; // default to desktop
 
     if (kHeadersSymbol) {
-      // Access the headers using the symbol
-      const kHeaders = req[kHeadersSymbol];
+      // Use type assertion to bypass TypeScript error
+      const kHeaders = (req as any)[kHeadersSymbol] as any;
 
       // Check for the 'sec-ch-ua-mobile' header
       if (kHeaders && kHeaders['sec-ch-ua-mobile']) {
