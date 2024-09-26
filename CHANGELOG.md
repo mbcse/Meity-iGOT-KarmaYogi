@@ -138,3 +138,26 @@ BRANCH : feature/005/llmsql
 - Added Charts for email camapaign comparision , no of visitors - communication wise, overall devices chart
 - Created overall pie component 
 - Create device chart for email campaign specifically
+
+## [pre-dev-0.1.0] - 2024-07-29
+
+branch : feature/016/settings
+
+Only UI has been done
+
+### Added
+
+- Settings page
+  - /#add
+   - Settings to add email accounts
+   - Settings to add phone numbers
+   - Settings for adding whatsapp bussiness numbers
+
+- /#db setup
+   - URL to connect Ext DB
+   - And Options to fill info of DB
+   - URL to connect inner DB
+- /# backend setup   
+   - Option to give express URL
+- /#llms
+   - Option to set up AI API key
