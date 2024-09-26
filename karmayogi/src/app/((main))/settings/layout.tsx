@@ -42,6 +42,9 @@ export default function Layout({
             <Link href="/settings/llms" className={`${pathname === '/settings/llms' ? 'font-semibold text-primary' : ''}`}>
               LLM Setup
             </Link>
+            <Link href="/settings/emails" className={`${pathname === '/settings/llms' ? 'font-semibold text-primary' : ''}`}>
+              Emails Setup
+            </Link>
           </nav>
           <div className="grid gap-6">
             {children}

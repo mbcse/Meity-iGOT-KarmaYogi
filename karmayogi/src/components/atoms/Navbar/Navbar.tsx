@@ -20,7 +20,9 @@ export default function Navbar() {
     { name: 'Buckets', link: '/buckets' },
     { name: 'Templates', link: LINKS.TEMPLATES },
     { name: 'Campaigns', link: '/campaigns' },
-    { name: 'Reports', link: '/reports' }
+    { name: 'Reports', link: '/reports' },
+    { name: 'Channels', link: '/channels' }
+  
   ]
 
   const handleLogout = async () => {

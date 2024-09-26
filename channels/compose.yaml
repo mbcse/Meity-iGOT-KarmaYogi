@@ -1,11 +1,11 @@
 services:
   mongo:
     image: mongo:latest
-    container_name: channels-mongo
+    container_name: channels-mongo1
     ports:
       - "7003:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongodata:/data/db
 
 volumes:
-  mongo-data:
+  mongodata:
