@@ -3,6 +3,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.routes';
+import producerRouter from './routes/producer.routes';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cors({
 app.use(cookieParser());
 
 app.use('/auth', authRouter);
+app.use('/producer', producerRouter);
 app.get('/health', (req, res) => {
   res.json('healthy');
 });
